@@ -18,9 +18,7 @@ class TestFlake:
         model.Session.delete(userobj)
         model.Session.commit()
 
-        assert (
-            not model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
-        )
+        assert not model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
 
     def test_user_not_removed_with_flake(self, user):
         flake = Flake(data={}, author_id=user["id"])
@@ -33,9 +31,7 @@ class TestFlake:
         model.Session.delete(flake)
         model.Session.commit()
 
-        assert (
-            not model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
-        )
+        assert not model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
         assert model.User.get(user["id"])
 
     def test_relationship(self, user):
@@ -75,28 +71,33 @@ class TestFlake:
         assert not q.filter_by(id=sister.id).one_or_none()
 
     def test_empty_name_no_unique(self, user):
-        model.Session.add_all([
-            Flake(data={}, author_id=user["id"]),
-            Flake(data={}, author_id=user["id"]),
-        ])
+        model.Session.add_all(
+            [
+                Flake(data={}, author_id=user["id"]),
+                Flake(data={}, author_id=user["id"]),
+            ]
+        )
         model.Session.commit()
 
     def test_same_name_can_be_used_by_different_user(self, user_factory):
         first = user_factory()
         second = user_factory()
 
-        model.Session.add_all([
-            Flake(data={}, name="name", author_id=first["id"]),
-            Flake(data={}, name="name", author_id=second["id"]),
-
-        ])
+        model.Session.add_all(
+            [
+                Flake(data={}, name="name", author_id=first["id"]),
+                Flake(data={}, name="name", author_id=second["id"]),
+            ]
+        )
         model.Session.commit()
 
     def test_same_name_canont_be_used_by_same_user(self, user):
-        model.Session.add_all([
-            Flake(data={}, name="name", author_id=user["id"]),
-            Flake(data={}, name="name", author_id=user["id"]),
-        ])
+        model.Session.add_all(
+            [
+                Flake(data={}, name="name", author_id=user["id"]),
+                Flake(data={}, name="name", author_id=user["id"]),
+            ]
+        )
         with pytest.raises(IntegrityError):
             model.Session.commit()
 
@@ -106,11 +107,12 @@ class TestFlake:
 
         f1 = Flake(data={}, name="first", author_id=first["id"])
         f2 = Flake(data={}, name="second", author_id=second["id"])
-        model.Session.add_all([
-            f1,
-            f2,
-
-        ])
+        model.Session.add_all(
+            [
+                f1,
+                f2,
+            ]
+        )
         model.Session.commit()
 
         assert not Flake.by_name(f1.name, f2.author_id)

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from ckanext.toolbelt.decorators import Collector
-
 import ckan.plugins.toolkit as tk
+
+from ckanext.toolbelt.decorators import Collector
 
 from ..model import Flake
 

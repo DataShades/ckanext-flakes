@@ -2,6 +2,7 @@ import ckan.plugins as p
 
 from .logic import action, auth, validators
 
+
 class FlakesPlugin(p.SingletonPlugin):
     p.implements(p.IActions)
     p.implements(p.IAuthFunctions)

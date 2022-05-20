@@ -14,7 +14,12 @@ def flake_create(context, data_dict):
     author = context["model"].User.get(context["user"])
 
     if "parent_id" in data_dict:
-        parent = context["session"].query(Flake).filter_by(id=data_dict["parent_id"]).one_or_none()
+        parent = (
+            context["session"]
+            .query(Flake)
+            .filter_by(id=data_dict["parent_id"])
+            .one_or_none()
+        )
         if not parent or parent.author_id != author.id:
             return {"success": False}
 
@@ -25,6 +30,7 @@ def flake_create(context, data_dict):
 def flake_show(context, data_dict):
     flake = context["session"].query(Flake).filter_by(id=data_dict["id"]).one_or_none()
     return {"success": flake and flake.author.name == context["user"]}
+
 
 @auth
 def flake_update(context, data_dict):

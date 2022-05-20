@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections import ChainMap
 from datetime import datetime
 from typing import Any, Optional
-from typing_extensions import Self
 
 import ckan.model as model
 from ckan.lib.dictization import table_dictize
@@ -12,6 +11,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, UnicodeText, UniqueConstrai
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship
 from sqlalchemy.sql.schema import ForeignKey
+from typing_extensions import Self
 
 from .base import Base
 
@@ -35,9 +35,7 @@ class Flake(Base):
     )
     parent = relationship(
         "Flake",
-        backref=backref(
-            "flakes", cascade="all, delete-orphan", single_parent=True
-        ),
+        backref=backref("flakes", cascade="all, delete-orphan", single_parent=True),
         remote_side=[id],
     )
 
@@ -58,4 +56,8 @@ class Flake(Base):
 
     @classmethod
     def by_name(cls, name: str, author_id: str) -> Optional[Self]:
-        return model.Session.query(cls).filter_by(name=name, author_id=author_id).one_or_none()
+        return (
+            model.Session.query(cls)
+            .filter_by(name=name, author_id=author_id)
+            .one_or_none()
+        )

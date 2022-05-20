@@ -5,13 +5,12 @@ Revises:
 Create Date: 2022-05-19 19:58:05.102181
 
 """
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects.postgresql import JSONB
 
-
 # revision identifiers, used by Alembic.
-revision = 'b8a5f5419306'
+revision = "b8a5f5419306"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -35,11 +34,9 @@ def upgrade():
             sa.ForeignKey("user.id"),
             nullable=False,
         ),
-        sa.Column(
-            "parent_id", sa.UnicodeText, sa.ForeignKey("flakes_flake.id")
-        ),
+        sa.Column("parent_id", sa.UnicodeText, sa.ForeignKey("flakes_flake.id")),
         sa.Column("extras", JSONB, nullable=False),
-        sa.UniqueConstraint("name", "author_id")
+        sa.UniqueConstraint("name", "author_id"),
     )
 
 

@@ -24,20 +24,38 @@ class TestFlakeCreate:
         assert result["name"] == "hello-world"
 
         with pytest.raises(tk.ValidationError):
-            call_action("flakes_flake_create", {"user": user["name"]}, data={}, name="hello-world")
+            call_action(
+                "flakes_flake_create",
+                {"user": user["name"]},
+                data={},
+                name="hello-world",
+            )
 
-        another = call_action("flakes_flake_create", {"user": another_user["name"]}, data={}, name="hello-world")
+        another = call_action(
+            "flakes_flake_create",
+            {"user": another_user["name"]},
+            data={},
+            name="hello-world",
+        )
         assert another["name"] == "hello-world"
 
     def test_parent_must_be_real(self, user):
         with pytest.raises(tk.ValidationError):
-            call_action("flakes_flake_create", {"user": user["name"]}, data={}, parent_id="not-real")
+            call_action(
+                "flakes_flake_create",
+                {"user": user["name"]},
+                data={},
+                parent_id="not-real",
+            )
 
     def test_normal_parent(self, user):
         parent = call_action("flakes_flake_create", {"user": user["name"]}, data={})
 
         child = call_action(
-            "flakes_flake_create", {"user": user["name"]}, data={}, parent_id=parent["id"]
+            "flakes_flake_create",
+            {"user": user["name"]},
+            data={},
+            parent_id=parent["id"],
         )
         assert child["parent_id"] == parent["id"]
 
@@ -46,7 +64,10 @@ class TestFlakeCreate:
         parent = call_action("flakes_flake_create", {"user": user["name"]}, data={})
         with pytest.raises(tk.ValidationError):
             call_action(
-                "flakes_flake_create", {"user": another_user["name"]}, data={}, parent_id=parent["id"]
+                "flakes_flake_create",
+                {"user": another_user["name"]},
+                data={},
+                parent_id=parent["id"],
             )
 
 
@@ -70,11 +91,7 @@ class TestFlakeUpdate:
 class TestFlakeDelete:
     def test_base(self, flake):
         call_action("flakes_flake_delete", id=flake["id"])
-        assert (
-            not model.Session.query(Flake)
-            .filter_by(id=flake["id"])
-            .one_or_none()
-        )
+        assert not model.Session.query(Flake).filter_by(id=flake["id"]).one_or_none()
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
@@ -96,18 +113,20 @@ class TestFlakeShow:
         result = call_action("flakes_flake_show", id=child["id"])
         assert result["data"] == {"override": "child"}
 
-        result = call_action(
-            "flakes_flake_show", id=child["id"], expand=True
-        )
+        result = call_action("flakes_flake_show", id=child["id"], expand=True)
         assert result["data"] == {"override": "child", "hello": "world"}
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestFlakeList:
     def test_base(self, user, flake_factory):
-        first = flake_factory(user=user, data={},
+        first = flake_factory(
+            user=user,
+            data={},
         )
-        second = flake_factory(user=user, data={},
+        second = flake_factory(
+            user=user,
+            data={},
         )
         result = call_action("flakes_flake_list", {"user": user["id"]})
         assert {first["id"], second["id"]} == {f["id"] for f in result}
@@ -134,14 +153,11 @@ class TestFlakeList:
         assert {"override": "first"} in datas
         assert {"override": "second"} in datas
 
-        result = call_action(
-            "flakes_flake_list", {"user": user["id"]}, expand=True
-        )
+        result = call_action("flakes_flake_list", {"user": user["id"]}, expand=True)
         datas = [f["data"] for f in result]
         assert {"hello": "world"} in datas
         assert {"override": "first"} in datas
         assert {"hello": "world", "override": "second"} in datas
-
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
@@ -151,9 +167,18 @@ class TestFlakeLookup:
         world = flake_factory(name="world", user=user)
         anon = flake_factory(user=user)
 
-        assert call_action("flakes_flake_lookup", {"user": user["name"]}, name="hello") == hello
-        assert call_action("flakes_flake_lookup", {"user": user["name"]}, name="world") == world
-        assert call_action("flakes_flake_lookup", {"user": user["name"]}, name=None) == anon
+        assert (
+            call_action("flakes_flake_lookup", {"user": user["name"]}, name="hello")
+            == hello
+        )
+        assert (
+            call_action("flakes_flake_lookup", {"user": user["name"]}, name="world")
+            == world
+        )
+        assert (
+            call_action("flakes_flake_lookup", {"user": user["name"]}, name=None)
+            == anon
+        )
 
     def test_not_real(self, user):
         with pytest.raises(tk.ObjectNotFound):
@@ -163,4 +188,6 @@ class TestFlakeLookup:
         flake = flake_factory(name="flake")
 
         with pytest.raises(tk.ObjectNotFound):
-            call_action("flakes_flake_lookup", {"user": user["name"]}, name=flake["name"])
+            call_action(
+                "flakes_flake_lookup", {"user": user["name"]}, name=flake["name"]
+            )

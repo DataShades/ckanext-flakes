@@ -5,8 +5,8 @@ from ckan.logic import validate
 
 from ckanext.toolbelt.decorators import Collector
 
-from . import schema
 from ..model import Flake
+from . import schema
 
 action, get_actions = Collector("flakes").split()
 
