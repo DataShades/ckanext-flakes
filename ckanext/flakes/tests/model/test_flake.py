@@ -1,5 +1,6 @@
 import ckan.model as model
 import pytest
+from sqlalchemy.exc import IntegrityError
 
 from ckanext.flakes.model.flake import Flake
 
@@ -48,7 +49,7 @@ class TestFlake:
         assert brother.parent == parent
         assert sister.parent == parent
 
-    def test_autoremove_of_flakes(self, user):
+    def test_autoremove_of_children(self, user):
         parent = Flake(data={}, author_id=user["id"])
         brother = Flake(data={}, author_id=user["id"], parent=parent)
         sister = Flake(data={}, author_id=user["id"], parent=parent)
@@ -72,3 +73,48 @@ class TestFlake:
         assert not q.filter_by(id=parent.id).one_or_none()
         assert not q.filter_by(id=brother.id).one_or_none()
         assert not q.filter_by(id=sister.id).one_or_none()
+
+    def test_empty_name_no_unique(self, user):
+        model.Session.add_all([
+            Flake(data={}, author_id=user["id"]),
+            Flake(data={}, author_id=user["id"]),
+        ])
+        model.Session.commit()
+
+    def test_same_name_can_be_used_by_different_user(self, user_factory):
+        first = user_factory()
+        second = user_factory()
+
+        model.Session.add_all([
+            Flake(data={}, name="name", author_id=first["id"]),
+            Flake(data={}, name="name", author_id=second["id"]),
+
+        ])
+        model.Session.commit()
+
+    def test_same_name_canont_be_used_by_same_user(self, user):
+        model.Session.add_all([
+            Flake(data={}, name="name", author_id=user["id"]),
+            Flake(data={}, name="name", author_id=user["id"]),
+        ])
+        with pytest.raises(IntegrityError):
+            model.Session.commit()
+
+    def test_search_by_name(self, user_factory):
+        first = user_factory()
+        second = user_factory()
+
+        f1 = Flake(data={}, name="first", author_id=first["id"])
+        f2 = Flake(data={}, name="second", author_id=second["id"])
+        model.Session.add_all([
+            f1,
+            f2,
+
+        ])
+        model.Session.commit()
+
+        assert not Flake.by_name(f1.name, f2.author_id)
+        assert not Flake.by_name(f2.name, f1.author_id)
+
+        assert Flake.by_name(f1.name, f1.author_id) == f1
+        assert Flake.by_name(f2.name, f2.author_id) == f2

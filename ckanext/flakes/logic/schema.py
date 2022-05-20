@@ -8,22 +8,20 @@ def flake_create(
     dict_only,
     ignore,
     ignore_missing,
+    unicode_safe,
     flakes_flake_id_exists,
-    flakes_flake_id_available,
-    user_id_or_name_exists,
 ):
     return {
-        "id": [ignore_missing, flakes_flake_id_available],
+        "name": [ignore_missing, unicode_safe],
         "data": [not_missing, convert_to_json_if_string, dict_only],
         "parent_id": [ignore_missing, flakes_flake_id_exists],
-        "author_id": [ignore_missing, user_id_or_name_exists],
+        "extras": [ignore_missing, convert_to_json_if_string, dict_only],
         "__extras": [ignore],
     }
 
 
 @validator_args
 def flake_update(
-    flakes_flake_id_exists,
     not_missing,
     convert_to_json_if_string,
     dict_only,
@@ -31,31 +29,39 @@ def flake_update(
     ignore_missing,
 ):
     return {
-        "id": [not_missing, flakes_flake_id_exists],
+        "id": [not_missing],
         "data": [not_missing, convert_to_json_if_string, dict_only],
-        "parent_id": [ignore_missing, flakes_flake_id_exists],
+        "parent_id": [ignore_missing],
+        "extras": [ignore_missing, convert_to_json_if_string, dict_only],
         "__extras": [ignore],
     }
 
 
 @validator_args
-def flake_delete(flakes_flake_id_exists, not_missing):
+def flake_delete(not_missing):
     return {
-        "id": [not_missing, flakes_flake_id_exists],
+        "id": [not_missing],
     }
 
 
 @validator_args
-def flake_show(flakes_flake_id_exists, not_missing, boolean_validator):
+def flake_show(not_missing, boolean_validator):
     return {
-        "id": [not_missing, flakes_flake_id_exists],
+        "id": [not_missing],
         "expand": [boolean_validator],
     }
 
 
 @validator_args
-def flake_list(boolean_validator, user_id_or_name_exists, not_missing):
+def flake_list(boolean_validator):
     return {
-        "author_id": [not_missing, user_id_or_name_exists],
+        "expand": [boolean_validator],
+    }
+
+
+@validator_args
+def flake_lookup(boolean_validator, not_missing):
+    return {
+        "name": [not_missing],
         "expand": [boolean_validator],
     }

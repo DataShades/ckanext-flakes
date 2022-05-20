@@ -8,35 +8,51 @@ from ckanext.flakes.model import Flake
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestFlakeCreate:
-    def test_base(self):
-        result = call_action("flakes_flake_create", data={})
+    def test_user_required(self, user):
+        with pytest.raises(tk.NotAuthorized):
+            call_action("flakes_flake_create", data={})
+
+    def test_base(self, user):
+        result = call_action("flakes_flake_create", {"user": user["name"]}, data={})
         assert model.Session.query(Flake).filter_by(id=result["id"]).one()
 
-    def test_controlled_id(self):
+    def test_name_must_be_unique_for_user(self, user, user_factory):
+        another_user = user_factory()
         result = call_action(
-            "flakes_flake_create", data={}, id="hello-world"
+            "flakes_flake_create", {"user": user["name"]}, data={}, name="hello-world"
         )
-        assert result["id"] == "hello-world"
+        assert result["name"] == "hello-world"
 
         with pytest.raises(tk.ValidationError):
-            call_action("flakes_flake_create", data={}, id="hello-world")
+            call_action("flakes_flake_create", {"user": user["name"]}, data={}, name="hello-world")
 
-    def test_parent_flake(self):
-        parent = call_action("flakes_flake_create", data={})
+        another = call_action("flakes_flake_create", {"user": another_user["name"]}, data={}, name="hello-world")
+        assert another["name"] == "hello-world"
 
+    def test_parent_must_be_real(self, user):
         with pytest.raises(tk.ValidationError):
-            call_action("flakes_flake_create", data={}, parent_id="not-real")
+            call_action("flakes_flake_create", {"user": user["name"]}, data={}, parent_id="not-real")
+
+    def test_normal_parent(self, user):
+        parent = call_action("flakes_flake_create", {"user": user["name"]}, data={})
 
         child = call_action(
-            "flakes_flake_create", data={}, parent_id=parent["id"]
+            "flakes_flake_create", {"user": user["name"]}, data={}, parent_id=parent["id"]
         )
         assert child["parent_id"] == parent["id"]
+
+    def test_parent_from_other_user(self, user, user_factory):
+        another_user = user_factory()
+        parent = call_action("flakes_flake_create", {"user": user["name"]}, data={})
+        with pytest.raises(tk.ValidationError):
+            call_action(
+                "flakes_flake_create", {"user": another_user["name"]}, data={}, parent_id=parent["id"]
+            )
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestFlakeUpdate:
-    def test_parent_flake(self):
-        flake = call_action("flakes_flake_create", data={})
+    def test_base(self, flake):
         q = model.Session.query(Flake).filter_by(id=flake["id"])
         context = {"model": model, "session": model.Session}
 
@@ -52,8 +68,7 @@ class TestFlakeUpdate:
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestFlakeDelete:
-    def test_base(self):
-        flake = call_action("flakes_flake_create", data={})
+    def test_base(self, flake):
         call_action("flakes_flake_delete", id=flake["id"])
         assert (
             not model.Session.query(Flake)
@@ -64,18 +79,16 @@ class TestFlakeDelete:
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestFlakeShow:
-    def test_base(self):
-        flake = call_action(
-            "flakes_flake_create",
+    def test_base(self, flake_factory):
+        flake = flake_factory(
             data={"hello": "world", "override": "parent"},
         )
         result = call_action("flakes_flake_show", id=flake["id"])
         assert flake == result
 
-    def test_parent(self):
-        parent = call_action("flakes_flake_create", data={"hello": "world"})
-        child = call_action(
-            "flakes_flake_create",
+    def test_parent(self, flake_factory):
+        parent = flake_factory(data={"hello": "world"})
+        child = flake_factory(
             data={"override": "child"},
             parent_id=parent["id"],
         )
@@ -91,45 +104,63 @@ class TestFlakeShow:
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestFlakeList:
-    def test_base(self, user):
-        first = call_action(
-            "flakes_flake_create", data={}, author_id=user["id"]
+    def test_base(self, user, flake_factory):
+        first = flake_factory(user=user, data={},
         )
-        second = call_action(
-            "flakes_flake_create", data={}, author_id=user["id"]
+        second = flake_factory(user=user, data={},
         )
-        result = call_action("flakes_flake_list", author_id=user["id"])
+        result = call_action("flakes_flake_list", {"user": user["id"]})
         assert {first["id"], second["id"]} == {f["id"] for f in result}
 
-    def test_parent(self, user):
-        parent = call_action(
-            "flakes_flake_create",
+    def test_parent(self, user, flake_factory):
+        parent = flake_factory(
+            user=user,
             data={"hello": "world"},
-            author_id=user["id"],
         )
 
-        call_action(
-            "flakes_flake_create",
+        flake_factory(
+            user=user,
             data={"override": "first"},
-            author_id=user["id"],
         )
-        call_action(
-            "flakes_flake_create",
+        flake_factory(
+            user=user,
             data={"override": "second"},
-            author_id=user["id"],
             parent_id=parent["id"],
         )
 
-        result = call_action("flakes_flake_list", author_id=user["id"])
+        result = call_action("flakes_flake_list", {"user": user["id"]})
         datas = [f["data"] for f in result]
         assert {"hello": "world"} in datas
         assert {"override": "first"} in datas
         assert {"override": "second"} in datas
 
         result = call_action(
-            "flakes_flake_list", author_id=user["id"], expand=True
+            "flakes_flake_list", {"user": user["id"]}, expand=True
         )
         datas = [f["data"] for f in result]
         assert {"hello": "world"} in datas
         assert {"override": "first"} in datas
         assert {"hello": "world", "override": "second"} in datas
+
+
+
+@pytest.mark.usefixtures("with_plugins", "clean_db")
+class TestFlakeLookup:
+    def test_base(self, flake_factory, user):
+        hello = flake_factory(name="hello", user=user)
+        world = flake_factory(name="world", user=user)
+        anon = flake_factory(user=user)
+
+        assert call_action("flakes_flake_lookup", {"user": user["name"]}, name="hello") == hello
+        assert call_action("flakes_flake_lookup", {"user": user["name"]}, name="world") == world
+        assert call_action("flakes_flake_lookup", {"user": user["name"]}, name=None) == anon
+
+    def test_not_real(self, user):
+        with pytest.raises(tk.ObjectNotFound):
+            call_action("flakes_flake_lookup", {"user": user["name"]}, name="not-real")
+
+    def test_different_user(self, flake_factory, user):
+        flake = flake_factory(name="flake")
+
+        with pytest.raises(tk.ObjectNotFound):
+            call_action("flakes_flake_lookup", {"user": user["name"]}, name=flake["name"])

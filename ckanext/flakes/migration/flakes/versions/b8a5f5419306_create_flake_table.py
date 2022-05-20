@@ -21,6 +21,7 @@ def upgrade():
     op.create_table(
         "flakes_flake",
         sa.Column("id", sa.UnicodeText, primary_key=True),
+        sa.Column("name", sa.UnicodeText, nullable=True),
         sa.Column("data", JSONB, nullable=False),
         sa.Column(
             "modified_at",
@@ -37,6 +38,8 @@ def upgrade():
         sa.Column(
             "parent_id", sa.UnicodeText, sa.ForeignKey("flakes_flake.id")
         ),
+        sa.Column("extras", JSONB, nullable=False),
+        sa.UniqueConstraint("name", "author_id")
     )
 
 
