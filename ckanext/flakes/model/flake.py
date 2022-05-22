@@ -39,7 +39,7 @@ class Flake(Base):
         remote_side=[id],
     )
 
-    def for_json(self, context: dict[str, Any]):
+    def dictize(self, context: dict[str, Any]):
         result = table_dictize(self, context)
 
         if context.get("expand"):

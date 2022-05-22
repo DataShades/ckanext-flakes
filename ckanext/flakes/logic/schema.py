@@ -65,3 +65,20 @@ def flake_lookup(boolean_validator, not_missing):
         "name": [not_missing],
         "expand": [boolean_validator],
     }
+
+
+@validator_args
+def flake_validate(boolean_validator, not_missing):
+    return {
+        "id": [not_missing],
+        "expand": [boolean_validator],
+        "schema": [not_missing],
+    }
+
+
+@validator_args
+def data_validate(convert_to_json_if_string, dict_only, not_missing):
+    return {
+        "data": [not_missing, convert_to_json_if_string, dict_only],
+        "schema": [not_missing],
+    }

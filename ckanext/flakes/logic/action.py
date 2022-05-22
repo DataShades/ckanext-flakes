@@ -1,7 +1,9 @@
 from __future__ import annotations
+from typing import Any
 
 import ckan.plugins.toolkit as tk
 from ckan.logic import validate
+from ckan.plugins import get_plugin
 
 from ckanext.toolbelt.decorators import Collector
 
@@ -32,7 +34,11 @@ def flake_create(context, data_dict):
         raise tk.NotAuthorized()
 
     if "parent_id" in data_dict:
-        parent = sess.query(Flake).filter_by(id=data_dict["parent_id"]).one()
+        parent = sess.query(Flake).filter_by(id=data_dict["parent_id"]).one_or_none()
+
+        if not parent:
+            raise tk.ObjectNotFound()
+
         if parent.author_id != user.id:
             raise tk.ValidationError({"parent_id": ["Must be owned by the same user"]})
 
@@ -43,7 +49,7 @@ def flake_create(context, data_dict):
     sess.add(flake)
     sess.commit()
 
-    return flake.for_json(context)
+    return flake.dictize(context)
 
 
 @action
@@ -52,18 +58,20 @@ def flake_show(context, data_dict):
     """Display existing flake
 
     Args:
-        id (str): ID of flake to update
+        id (str): ID of flake to display
         expand (bool, optional): Extend flake using data from the parent flakes
     """
 
     tk.check_access("flakes_flake_show", context, data_dict)
 
     sess = context["session"]
-    flake = sess.query(Flake).filter_by(id=data_dict["id"]).one()
+    flake: Flake = sess.query(Flake).filter_by(id=data_dict["id"]).one_or_none()
+    if not flake:
+        raise tk.ObjectNotFound()
 
     context["expand"] = data_dict["expand"]
 
-    return flake.for_json(context)
+    return flake.dictize(context)
 
 
 @action
@@ -80,7 +88,7 @@ def flake_list(context, data_dict):
     user = context["model"].User.get(context["user"])
     context["expand"] = data_dict["expand"]
 
-    return [flake.for_json(context) for flake in user.flakes]
+    return [flake.dictize(context) for flake in user.flakes]
 
 
 @action
@@ -97,13 +105,16 @@ def flake_update(context, data_dict):
     tk.check_access("flakes_flake_update", context, data_dict)
 
     sess = context["session"]
-    flake = sess.query(Flake).filter_by(id=data_dict["id"]).one()
+    flake = sess.query(Flake).filter_by(id=data_dict["id"]).one_or_none()
+
+    if not flake:
+        raise tk.ObjectNotFound()
 
     for k, v in data_dict.items():
         setattr(flake, k, v)
     sess.commit()
 
-    return flake.for_json(context)
+    return flake.dictize(context)
 
 
 @action
@@ -118,11 +129,15 @@ def flake_delete(context, data_dict):
     tk.check_access("flakes_flake_delete", context, data_dict)
 
     sess = context["session"]
-    flake = sess.query(Flake).filter_by(id=data_dict["id"]).one()
+    flake = sess.query(Flake).filter_by(id=data_dict["id"]).one_or_none()
+
+    if not flake:
+        raise tk.ObjectNotFound()
+
     sess.delete(flake)
     sess.commit()
 
-    return flake.for_json(context)
+    return flake.dictize(context)
 
 
 @action
@@ -141,4 +156,55 @@ def flake_lookup(context, data_dict):
     if not flake:
         raise tk.ObjectNotFound()
 
-    return flake.for_json(context)
+    return flake.dictize(context)
+
+
+@action
+@validate(schema.flake_validate)
+def flake_validate(context, data_dict):
+    """Validate existing flake
+
+    Args:
+        id (str): ID of flake to validate
+        expand (bool, optional): Extend flake using data from the parent flakes
+        schema(str): validation schema for the flake's data
+    """
+
+    tk.check_access("flakes_flake_validate", context, data_dict)
+    flake = tk.get_action("flakes_flake_show")(context, data_dict)
+
+    return tk.get_action("flakes_data_validate")(
+        context,
+        {
+            "data": flake["data"],
+            "expand": data_dict["expand"],
+            "schema": data_dict["schema"],
+        },
+    )
+
+
+@action
+@validate(schema.data_validate)
+def data_validate(context, data_dict):
+    """Validate arbitrary data against the schema.
+
+    Args:
+        data (dict): data that needs to be validated
+        schema(str): validation schema for the data
+    """
+
+    tk.check_access("flakes_data_validate", context, data_dict)
+
+    schema = _get_schema(data_dict["schema"])
+    data, errors = tk.navl_validate(data_dict["data"], schema, context)
+
+    return {
+        "data": data,
+        "errors": errors,
+    }
+
+
+def _get_schema(name: str) -> dict[str, Any]:
+    plugin = get_plugin("flakes")
+    schema = plugin.resolve_flake_schema(name)
+    return schema

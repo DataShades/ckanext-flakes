@@ -77,14 +77,18 @@ class TestFlakeUpdate:
         q = model.Session.query(Flake).filter_by(id=flake["id"])
         context = {"model": model, "session": model.Session}
 
-        assert q.one().for_json(context) == flake
+        assert q.one().dictize(context) == flake
 
         updated = call_action(
             "flakes_flake_update", id=flake["id"], data={"hello": "world"}
         )
         assert flake["id"] == updated["id"]
         assert updated["data"] == {"hello": "world"}
-        assert q.one().for_json(context) == updated
+        assert q.one().dictize(context) == updated
+
+    def test_missing(self):
+        with pytest.raises(tk.ObjectNotFound):
+            call_action("flakes_flake_update", id="not-real", data={})
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
@@ -93,9 +97,17 @@ class TestFlakeDelete:
         call_action("flakes_flake_delete", id=flake["id"])
         assert not model.Session.query(Flake).filter_by(id=flake["id"]).one_or_none()
 
+    def test_missing(self):
+        with pytest.raises(tk.ObjectNotFound):
+            call_action("flakes_flake_delete", id="not-real")
+
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestFlakeShow:
+    def test_missing(self):
+        with pytest.raises(tk.ObjectNotFound):
+            call_action("flakes_flake_show", id="not-real")
+
     def test_base(self, flake_factory):
         flake = flake_factory(
             data={"hello": "world", "override": "parent"},
@@ -191,3 +203,33 @@ class TestFlakeLookup:
             call_action(
                 "flakes_flake_lookup", {"user": user["name"]}, name=flake["name"]
             )
+
+
+@pytest.mark.ckan_config("ckan.plugins", "flakes flakes_test")
+@pytest.mark.usefixtures("with_plugins", "clean_db")
+class TestFlakeValidate:
+    def test_missing(self):
+        with pytest.raises(tk.ObjectNotFound):
+            call_action("flakes_flake_validate", id="not-real", schema="empty")
+
+    def test_base(self, flake):
+        schema = "empty"
+        result = call_action("flakes_flake_validate", id=flake["id"], schema=schema)
+
+        assert result == call_action(
+            "flakes_data_validate", data=flake["data"], schema=schema
+        )
+
+    def test_expanded(self):
+        # TODO: spent another 1.5 minutes on this test
+        pass
+
+
+@pytest.mark.ckan_config("ckan.plugins", "flakes flakes_test")
+@pytest.mark.usefixtures("with_plugins")
+class TestDataValidate:
+    def test_base(self):
+        data = {"hello": "world"}
+        result = call_action("flakes_data_validate", data=data, schema="empty")
+
+        assert result == {"errors": {}, "data": {"__extras": data}}
