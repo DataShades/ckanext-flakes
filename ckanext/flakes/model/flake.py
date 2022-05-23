@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import ChainMap
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Iterable, Optional
 
 import ckan.model as model
 from ckan.lib.dictization import table_dictize
@@ -74,10 +74,28 @@ class Flake(Base):
         return result
 
     @classmethod
+    def by_author(cls, author_id: str) -> Iterable[Self]:
+        """Get user's flakes."""
+        return model.Session.query(cls).filter_by(author_id=author_id)
+
+    @classmethod
     def by_name(cls, name: str, author_id: str) -> Optional[Self]:
         """Get user's flake using unique name of flake."""
         return (
             model.Session.query(cls)
             .filter_by(name=name, author_id=author_id)
             .one_or_none()
+        )
+
+    @classmethod
+    def by_extra(
+        cls, path: Iterable[str], value: str, author_id: str
+    ) -> Iterable[Self]:
+        """Get user's flakes using extra attribute."""
+        key: Any = cls.extras
+        for segment in path:
+            key = key[segment]
+
+        return model.Session.query(cls).filter(
+            cls.author_id == author_id, key.astext == value
         )

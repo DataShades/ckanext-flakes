@@ -10,9 +10,10 @@ def flake_create(
     ignore_missing,
     unicode_safe,
     flakes_flake_id_exists,
+    ignore_empty,
 ):
     return {
-        "name": [ignore_missing, unicode_safe],
+        "name": [ignore_empty, unicode_safe],
         "data": [not_missing, convert_to_json_if_string, dict_only],
         "parent_id": [ignore_missing, flakes_flake_id_exists],
         "extras": [ignore_missing, convert_to_json_if_string, dict_only],
@@ -39,10 +40,10 @@ def flake_update(
 
 
 @validator_args
-def flake_override(not_missing, unicode_safe):
+def flake_override(not_empty, unicode_safe):
     schema = flake_update()
     schema.pop("id")
-    schema["name"] = [not_missing, unicode_safe]
+    schema["name"] = [not_empty, unicode_safe]
     return schema
 
 
@@ -62,16 +63,20 @@ def flake_show(not_missing, boolean_validator, unicode_safe):
 
 
 @validator_args
-def flake_list(boolean_validator):
+def flake_list(
+    boolean_validator, ignore_missing, unicode_safe, json_list_or_string
+):
     return {
         "expand": [boolean_validator],
+        "extra_path": [ignore_missing, json_list_or_string],
+        "extra_value": [ignore_missing, unicode_safe],
     }
 
 
 @validator_args
-def flake_lookup(boolean_validator, not_missing, unicode_safe):
+def flake_lookup(boolean_validator, not_empty, unicode_safe):
     return {
-        "name": [not_missing, unicode_safe],
+        "name": [not_empty, unicode_safe],
         "expand": [boolean_validator],
     }
 

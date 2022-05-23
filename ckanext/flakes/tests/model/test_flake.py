@@ -124,3 +124,43 @@ class TestFlake:
 
         assert Flake.by_name(f1.name, f1.author_id) == f1
         assert Flake.by_name(f2.name, f2.author_id) == f2
+
+    def test_search_by_extra(self, user_factory):
+        first = user_factory()
+        second = user_factory()
+
+        f1 = Flake(data={}, extras={"tag": "hello"}, author_id=first["id"])
+        f2 = Flake(data={}, extras={"tag": "hello"}, author_id=second["id"])
+        f3 = Flake(
+            data={}, extras={"tag": {"nested": "hello"}}, author_id=first["id"]
+        )
+        model.Session.add_all([f1, f2, f3])
+        model.Session.commit()
+
+        assert list(Flake.by_extra(["tag"], "hello", f2.author_id)) == [f2]
+        assert list(Flake.by_extra(["tag"], "hello", f1.author_id)) == [f1]
+
+        assert list(
+            Flake.by_extra(["tag", "nested"], "hello", f1.author_id)
+        ) == [f3]
+        assert (
+            list(Flake.by_extra(["tag", "nested"], "hello", f2.author_id))
+            == []
+        )
+
+    def test_search_by_author(self, user_factory):
+        first = user_factory()
+        second = user_factory()
+
+        f1 = Flake(data={}, author_id=first["id"])
+        f2 = Flake(data={}, author_id=second["id"])
+        model.Session.add_all(
+            [
+                f1,
+                f2,
+            ]
+        )
+        model.Session.commit()
+
+        assert list(Flake.by_author(f2.author_id)) == [f2]
+        assert list(Flake.by_author(f1.author_id)) == [f1]

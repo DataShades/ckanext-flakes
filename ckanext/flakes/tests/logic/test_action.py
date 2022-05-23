@@ -181,6 +181,24 @@ class TestFlakeList:
         result = call_action("flakes_flake_list", {"user": user["id"]})
         assert {first["id"], second["id"]} == {f["id"] for f in result}
 
+    def test_extra(self, user, flake_factory):
+        first = flake_factory(
+            user=user,
+            extras={"xxx": {"yyy": "hello"}},
+        )
+        flake_factory(
+            user=user,
+            extras={"xxx": {"yyy": "world"}},
+        )
+
+        result = call_action(
+            "flakes_flake_list",
+            {"user": user["id"]},
+            extra_value="hello",
+            extra_path=["xxx", "yyy"],
+        )
+        assert {first["id"]} == {f["id"] for f in result}
+
     def test_parent(self, user, flake_factory):
         parent = flake_factory(
             user=user,
@@ -217,7 +235,7 @@ class TestFlakeLookup:
     def test_base(self, flake_factory, user):
         hello = flake_factory(name="hello", user=user)
         world = flake_factory(name="world", user=user)
-        anon = flake_factory(user=user)
+        flake_factory(user=user)
 
         assert (
             call_action(
@@ -230,12 +248,6 @@ class TestFlakeLookup:
                 "flakes_flake_lookup", {"user": user["name"]}, name="world"
             )
             == world
-        )
-        assert (
-            call_action(
-                "flakes_flake_lookup", {"user": user["name"]}, name=None
-            )
-            == anon
         )
 
     def test_not_real(self, user):

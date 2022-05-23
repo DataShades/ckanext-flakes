@@ -92,8 +92,21 @@ def flake_show(context, data_dict):
 def flake_list(context, data_dict):
     """Display all flakes of the user.
 
+    If both `extra_path` in form of `["top_level_key", "nested_key", ...]` and
+    string `extra_value` are provided, show only flakes that satisfy given
+    search criteria. Example:
+
+        first_flake = Flake(extras={"xxx": {"yyy": "hello"}})
+        second_flake = Flake(extras={"xxx": {"yyy": "world"}})
+
+        flake_list(context, {"extra_path": ["xxx", "yyy"], "extra_value": "hello"})
+        >>> first_flake
+
     Args:
         expand (bool, optional): Extend flake using data from the parent flakes
+        extra_path (list, optional): Nested path existing in extras
+        extra_value (str, optional): Value stored under the specified path
+
     """
 
     tk.check_access("flakes_flake_list", context, data_dict)
@@ -101,7 +114,14 @@ def flake_list(context, data_dict):
     user = context["model"].User.get(context["user"])
     context["expand"] = data_dict["expand"]
 
-    return [flake.dictize(context) for flake in user.flakes]
+    if "extra_path" in data_dict and "extra_value" in data_dict:
+        flakes = Flake.by_extra(
+            data_dict["extra_path"], data_dict["extra_value"], user.id
+        )
+    else:
+        flakes = user.flakes
+
+    return [flake.dictize(context) for flake in flakes]
 
 
 @action
