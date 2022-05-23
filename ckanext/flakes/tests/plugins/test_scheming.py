@@ -15,6 +15,7 @@ class TestPlugin:
     def test_organization(self):
         result = call_action(
             "flakes_data_validate",
+            {"include_data": True},
             data={"flake_name": "name", "hello": "world"},
             schema="scheming_organization_flake-organization",
         )
@@ -30,6 +31,7 @@ class TestPlugin:
     def test_group(self):
         result = call_action(
             "flakes_data_validate",
+            {"include_data": True},
             data={"flake_name": "name", "hello": "world"},
             schema="scheming_group_flake-group",
         )
@@ -45,6 +47,7 @@ class TestPlugin:
     def test_dataset(self):
         result = call_action(
             "flakes_data_validate",
+            {"include_data": True},
             data={"flake_name": "name", "hello": "world"},
             schema="scheming_dataset_flake-dataset",
         )
@@ -60,6 +63,7 @@ class TestPlugin:
     def test_resource(self):
         result = call_action(
             "flakes_data_validate",
+            {"include_data": True},
             data={"flake_name": "name", "hello": "world"},
             schema="scheming_resource_flake-dataset",
         )

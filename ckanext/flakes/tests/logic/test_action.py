@@ -288,12 +288,13 @@ class TestFlakeValidate:
         child = flake_factory(parent_id=flake["id"], data={"hello": "world"})
 
         result = call_action(
-            "flakes_flake_validate", id=child["id"], schema="empty"
+            "flakes_flake_validate", {"include_data": True}, id=child["id"], schema="empty"
         )
         assert result["data"] == {"__extras": {"hello": "world"}}
 
         result = call_action(
             "flakes_flake_validate",
+            {"include_data": True},
             id=child["id"],
             schema="empty",
             expand=True,
@@ -308,7 +309,7 @@ class TestFlakeValidate:
 class TestDataValidate:
     def test_base(self):
         data = {"hello": "world"}
-        result = call_action("flakes_data_validate", data=data, schema="empty")
+        result = call_action("flakes_data_validate", {"include_data": True}, data=data, schema="empty")
 
         assert result == {"errors": {}, "data": {"__extras": data}}
 

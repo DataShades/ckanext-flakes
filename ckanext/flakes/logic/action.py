@@ -259,10 +259,13 @@ def data_validate(context, data_dict):
     schema = _get_schema(data_dict["schema"])
     data, errors = tk.navl_validate(data_dict["data"], schema, context)
 
-    return {
-        "data": data,
+    result = {
         "errors": errors,
     }
+    if context.get("include_data"):
+        result["data"] = data
+
+    return result
 
 
 def _get_schema(name: str) -> dict[str, Any]:
