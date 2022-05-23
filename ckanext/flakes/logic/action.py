@@ -35,13 +35,19 @@ def flake_create(context, data_dict):
         raise tk.NotAuthorized()
 
     if "parent_id" in data_dict:
-        parent = sess.query(Flake).filter_by(id=data_dict["parent_id"]).one_or_none()
+        parent = (
+            sess.query(Flake)
+            .filter_by(id=data_dict["parent_id"])
+            .one_or_none()
+        )
 
         if not parent:
             raise tk.ObjectNotFound()
 
         if parent.author_id != user.id:
-            raise tk.ValidationError({"parent_id": ["Must be owned by the same user"]})
+            raise tk.ValidationError(
+                {"parent_id": ["Must be owned by the same user"]}
+            )
 
     if "name" in data_dict and Flake.by_name(data_dict["name"], user.id):
         raise tk.ValidationError({"name": ["Must be unique"]})
@@ -67,7 +73,9 @@ def flake_show(context, data_dict):
     tk.check_access("flakes_flake_show", context, data_dict)
 
     sess = context["session"]
-    flake: Flake = sess.query(Flake).filter_by(id=data_dict["id"]).one_or_none()
+    flake: Flake = (
+        sess.query(Flake).filter_by(id=data_dict["id"]).one_or_none()
+    )
     if not flake:
         raise tk.ObjectNotFound()
 
@@ -211,8 +219,7 @@ def data_validate(context, data_dict):
 
 
 def _get_schema(name: str) -> dict[str, Any]:
-    """Get named validation schema for flake's data.
-    """
+    """Get named validation schema for flake's data."""
     plugin = get_plugin("flakes")
     schema = plugin.resolve_flake_schema(name)
     return schema

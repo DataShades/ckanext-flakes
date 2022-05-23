@@ -18,7 +18,9 @@ class TestFlake:
         model.Session.delete(userobj)
         model.Session.commit()
 
-        assert not model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
+        assert (
+            not model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
+        )
 
     def test_user_not_removed_with_flake(self, user):
         flake = Flake(data={}, author_id=user["id"])
@@ -31,7 +33,9 @@ class TestFlake:
         model.Session.delete(flake)
         model.Session.commit()
 
-        assert not model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
+        assert (
+            not model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
+        )
         assert model.User.get(user["id"])
 
     def test_relationship(self, user):

@@ -7,10 +7,15 @@ from typing import Any, Optional
 import ckan.model as model
 from ckan.lib.dictization import table_dictize
 from ckan.model.types import make_uuid
-from sqlalchemy import Column, DateTime, ForeignKey, UnicodeText, UniqueConstraint
+from sqlalchemy import (
+    Column,
+    DateTime,
+    ForeignKey,
+    UnicodeText,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship
-from sqlalchemy.sql.schema import ForeignKey
 from typing_extensions import Self
 
 from .base import Base
@@ -22,9 +27,15 @@ class Flake(Base):
     id = Column(UnicodeText, primary_key=True, default=make_uuid)
     name: Optional[str] = Column(UnicodeText, unique=True, nullable=True)
     data: dict[str, Any] = Column(JSONB, nullable=False)
-    modified_at: datetime = Column(DateTime, nullable=False, default=datetime.utcnow)
-    author_id: str = Column(UnicodeText, ForeignKey(model.User.id), nullable=False)
-    parent_id: Optional[str] = Column(UnicodeText, ForeignKey("flakes_flake.id"))
+    modified_at: datetime = Column(
+        DateTime, nullable=False, default=datetime.utcnow
+    )
+    author_id: str = Column(
+        UnicodeText, ForeignKey(model.User.id), nullable=False
+    )
+    parent_id: Optional[str] = Column(
+        UnicodeText, ForeignKey("flakes_flake.id")
+    )
     extras: dict[str, Any] = Column(JSONB, nullable=False, default=dict)
 
     UniqueConstraint(name, author_id)
@@ -35,7 +46,9 @@ class Flake(Base):
     )
     parent = relationship(
         "Flake",
-        backref=backref("flakes", cascade="all, delete-orphan", single_parent=True),
+        backref=backref(
+            "flakes", cascade="all, delete-orphan", single_parent=True
+        ),
         remote_side=[id],
     )
 
@@ -62,8 +75,7 @@ class Flake(Base):
 
     @classmethod
     def by_name(cls, name: str, author_id: str) -> Optional[Self]:
-        """Get user's flake using unique name of flake.
-        """
+        """Get user's flake using unique name of flake."""
         return (
             model.Session.query(cls)
             .filter_by(name=name, author_id=author_id)

@@ -69,7 +69,10 @@ def flake_delete(context, data_dict):
 
 @auth
 def flake_validate(context, data_dict):
-    return {"success": _valdiation_allowed() and _owns_flake(context, data_dict["id"])}
+    return {
+        "success": _valdiation_allowed()
+        and _owns_flake(context, data_dict["id"])
+    }
 
 
 @auth

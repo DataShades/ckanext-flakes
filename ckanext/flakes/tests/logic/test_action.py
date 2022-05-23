@@ -13,13 +13,18 @@ class TestFlakeCreate:
             call_action("flakes_flake_create", data={})
 
     def test_base(self, user):
-        result = call_action("flakes_flake_create", {"user": user["name"]}, data={})
+        result = call_action(
+            "flakes_flake_create", {"user": user["name"]}, data={}
+        )
         assert model.Session.query(Flake).filter_by(id=result["id"]).one()
 
     def test_name_must_be_unique_for_user(self, user, user_factory):
         another_user = user_factory()
         result = call_action(
-            "flakes_flake_create", {"user": user["name"]}, data={}, name="hello-world"
+            "flakes_flake_create",
+            {"user": user["name"]},
+            data={},
+            name="hello-world",
         )
         assert result["name"] == "hello-world"
 
@@ -49,7 +54,9 @@ class TestFlakeCreate:
             )
 
     def test_normal_parent(self, user):
-        parent = call_action("flakes_flake_create", {"user": user["name"]}, data={})
+        parent = call_action(
+            "flakes_flake_create", {"user": user["name"]}, data={}
+        )
 
         child = call_action(
             "flakes_flake_create",
@@ -61,7 +68,9 @@ class TestFlakeCreate:
 
     def test_parent_from_other_user(self, user, user_factory):
         another_user = user_factory()
-        parent = call_action("flakes_flake_create", {"user": user["name"]}, data={})
+        parent = call_action(
+            "flakes_flake_create", {"user": user["name"]}, data={}
+        )
         with pytest.raises(tk.ValidationError):
             call_action(
                 "flakes_flake_create",
@@ -95,7 +104,11 @@ class TestFlakeUpdate:
 class TestFlakeDelete:
     def test_base(self, flake):
         call_action("flakes_flake_delete", id=flake["id"])
-        assert not model.Session.query(Flake).filter_by(id=flake["id"]).one_or_none()
+        assert (
+            not model.Session.query(Flake)
+            .filter_by(id=flake["id"])
+            .one_or_none()
+        )
 
     def test_missing(self):
         with pytest.raises(tk.ObjectNotFound):
@@ -165,7 +178,9 @@ class TestFlakeList:
         assert {"override": "first"} in datas
         assert {"override": "second"} in datas
 
-        result = call_action("flakes_flake_list", {"user": user["id"]}, expand=True)
+        result = call_action(
+            "flakes_flake_list", {"user": user["id"]}, expand=True
+        )
         datas = [f["data"] for f in result]
         assert {"hello": "world"} in datas
         assert {"override": "first"} in datas
@@ -180,28 +195,38 @@ class TestFlakeLookup:
         anon = flake_factory(user=user)
 
         assert (
-            call_action("flakes_flake_lookup", {"user": user["name"]}, name="hello")
+            call_action(
+                "flakes_flake_lookup", {"user": user["name"]}, name="hello"
+            )
             == hello
         )
         assert (
-            call_action("flakes_flake_lookup", {"user": user["name"]}, name="world")
+            call_action(
+                "flakes_flake_lookup", {"user": user["name"]}, name="world"
+            )
             == world
         )
         assert (
-            call_action("flakes_flake_lookup", {"user": user["name"]}, name=None)
+            call_action(
+                "flakes_flake_lookup", {"user": user["name"]}, name=None
+            )
             == anon
         )
 
     def test_not_real(self, user):
         with pytest.raises(tk.ObjectNotFound):
-            call_action("flakes_flake_lookup", {"user": user["name"]}, name="not-real")
+            call_action(
+                "flakes_flake_lookup", {"user": user["name"]}, name="not-real"
+            )
 
     def test_different_user(self, flake_factory, user):
         flake = flake_factory(name="flake")
 
         with pytest.raises(tk.ObjectNotFound):
             call_action(
-                "flakes_flake_lookup", {"user": user["name"]}, name=flake["name"]
+                "flakes_flake_lookup",
+                {"user": user["name"]},
+                name=flake["name"],
             )
 
 
@@ -214,7 +239,9 @@ class TestFlakeValidate:
 
     def test_base(self, flake):
         schema = "empty"
-        result = call_action("flakes_flake_validate", id=flake["id"], schema=schema)
+        result = call_action(
+            "flakes_flake_validate", id=flake["id"], schema=schema
+        )
 
         assert result == call_action(
             "flakes_data_validate", data=flake["data"], schema=schema
