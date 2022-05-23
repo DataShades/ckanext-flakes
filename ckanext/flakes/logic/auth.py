@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import Any
 
 import ckan.plugins.toolkit as tk
@@ -78,3 +79,13 @@ def flake_validate(context, data_dict):
 @auth
 def data_validate(context, data_dict):
     return {"success": _valdiation_allowed()}
+
+
+@auth
+def flake_materialize(context, data_dict):
+    return {"success": _owns_flake(context, data_dict["id"])}
+
+
+@auth
+def flake_combine(context, data_dict):
+    return {"success": True}

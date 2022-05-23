@@ -18,3 +18,12 @@ def flake_id_exists(value, context):
     if not result:
         raise tk.Invalid("Not Found: Flake")
     return value
+
+
+@validator
+def into_api_action(value):
+    """Get API action by name."""
+    try:
+        return tk.get_action(value)
+    except KeyError as e:
+        raise tk.Invalid(str(e))

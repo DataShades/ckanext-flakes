@@ -1,6 +1,7 @@
 import ckan.plugins.toolkit as tk
 import pytest
 from ckan.tests.helpers import call_auth
+
 from ckanext.flakes.logic.auth import CONFIG_VALIDATION_ALLOWED
 
 
@@ -14,6 +15,10 @@ from ckanext.flakes.logic.auth import CONFIG_VALIDATION_ALLOWED
         "flakes_flake_list",
         "flakes_flake_update",
         "flakes_flake_lookup",
+        "flakes_flake_validate",
+        "flakes_data_validate",
+        "flakes_flake_materialize",
+        "flakes_flake_combine",
     ],
 )
 def test_annon_cannot(auth):
@@ -28,6 +33,7 @@ def test_annon_cannot(auth):
         "flakes_flake_create",
         "flakes_flake_list",
         "flakes_flake_lookup",
+        "flakes_flake_combine",
     ],
 )
 def test_user_can(auth, user):
@@ -35,7 +41,7 @@ def test_user_can(auth, user):
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
-class TestUpdate:
+class TestFlakeUpdate:
     def test_user_can_update(self, user_factory, flake_factory):
         user = user_factory()
         author = user_factory()
@@ -51,7 +57,7 @@ class TestUpdate:
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
-class TestDelete:
+class TestFlakeDelete:
     def test_user_can_delete(self, user_factory, flake_factory):
         user = user_factory()
         author = user_factory()
@@ -67,7 +73,7 @@ class TestDelete:
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
-class TestShow:
+class TestFlakeShow:
     def test_user_can_show(self, user_factory, flake_factory):
         user = user_factory()
         author = user_factory()
@@ -128,3 +134,23 @@ class TestDataValidate:
     @pytest.mark.ckan_config(CONFIG_VALIDATION_ALLOWED, True)
     def test_can_validate_when_allowed(self, user):
         assert call_auth("flakes_data_validate", {"user": user["name"]})
+
+
+@pytest.mark.usefixtures("with_plugins", "clean_db")
+class TestFlakeMaterialize:
+    def test_user_can_materialize(self, user_factory, flake_factory):
+        user = user_factory()
+        author = user_factory()
+        flake = flake_factory(user=author)
+
+        assert call_auth(
+            "flakes_flake_materialize",
+            {"user": author["name"]},
+            id=flake["id"],
+        )
+        with pytest.raises(tk.NotAuthorized):
+            call_auth(
+                "flakes_flake_materialize",
+                {"user": user["name"]},
+                id=flake["id"],
+            )

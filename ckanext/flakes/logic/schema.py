@@ -82,3 +82,27 @@ def data_validate(convert_to_json_if_string, dict_only, not_missing):
         "data": [not_missing, convert_to_json_if_string, dict_only],
         "schema": [not_missing],
     }
+
+
+@validator_args
+def flake_materialize(boolean_validator, not_missing, flakes_into_api_action):
+    return {
+        "id": [not_missing],
+        "expand": [boolean_validator],
+        "remove": [boolean_validator],
+        "action": [not_missing, flakes_into_api_action],
+    }
+
+
+@validator_args
+def flake_combine(
+    default,
+    not_missing,
+    json_list_or_string,
+    convert_to_json_if_string,
+    dict_only,
+):
+    return {
+        "id": [not_missing, json_list_or_string],
+        "expand": [default("{}"), convert_to_json_if_string, dict_only],
+    }

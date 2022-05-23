@@ -1,6 +1,5 @@
 import ckan.plugins as p
 
-
 from ..interfaces import IFlakes
 
 

@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+from collections import ChainMap
 from typing import Any
 
 import ckan.plugins.toolkit as tk
@@ -184,7 +186,7 @@ def flake_validate(context, data_dict):
     """
 
     tk.check_access("flakes_flake_validate", context, data_dict)
-    flake = tk.get_action("flakes_flake_show")(context, data_dict)
+    flake = tk.get_action("flakes_flake_show")(context.copy(), data_dict)
 
     return tk.get_action("flakes_data_validate")(
         context,
@@ -223,3 +225,68 @@ def _get_schema(name: str) -> dict[str, Any]:
     plugin = get_plugin("flakes")
     schema = plugin.resolve_flake_schema(name)
     return schema
+
+
+@action
+@validate(schema.flake_materialize)
+def flake_materialize(context, data_dict):
+    """Display existing flake
+
+    Args:
+        id (str): ID of flake to display
+        expand (bool, optional): Extend flake using data from the parent flakes
+        remove (bool, optional): Remove flake after materialization
+        action (str): API action to use for materialization
+    """
+
+    tk.check_access("flakes_flake_materialize", context, data_dict)
+
+    flake = tk.get_action("flakes_flake_show")(
+        context.copy(),
+        {
+            "id": data_dict["id"],
+            "expand": data_dict["expand"],
+        },
+    )
+
+    materialization = data_dict["action"](context.copy(), flake["data"])
+
+    if data_dict["remove"]:
+        tk.get_action("flakes_flake_delete")(context, {"id": data_dict["id"]})
+
+    return materialization
+
+
+@action
+@validate(schema.flake_combine)
+def flake_combine(context, data_dict):
+    """Combine and show data from multiple flakes
+
+    `id` argument specifies all the flakes that must be combined. All of the
+    flakes must exist, otherwise NotFound error raised. IDs at the start of the
+    list have higher priority(override matching keys). IDs at the end of the
+    list have lower priority(can be shadowed by former flakes).
+
+    `expand` must be a dict[str, bool]. Keys are IDs of the flakes, values are
+    expand flags for the corresponding flake.
+
+    Args:
+        id (list): IDs of flakes.
+        expand (dict, optional): Extend flake using data from the parent flakes
+
+    """
+
+    tk.check_access("flakes_flake_combine", context, data_dict)
+
+    show = tk.get_action("flakes_flake_show")
+    flakes = (
+        show(
+            context.copy(),
+            {"id": id_, "expand": data_dict["expand"].get(id_, False)},
+        )
+        for id_ in data_dict["id"]
+    )
+
+    result = ChainMap(*(flake["data"] for flake in flakes))
+
+    return dict(result)
