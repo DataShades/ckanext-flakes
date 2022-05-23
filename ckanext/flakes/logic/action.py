@@ -53,6 +53,7 @@ def flake_create(context, data_dict):
 
 
 @action
+@tk.side_effect_free
 @validate(schema.flake_show)
 def flake_show(context, data_dict):
     """Display existing flake
@@ -75,6 +76,7 @@ def flake_show(context, data_dict):
 
 
 @action
+@tk.side_effect_free
 @validate(schema.flake_list)
 def flake_list(context, data_dict):
     """Display all flakes of the user.
@@ -141,6 +143,7 @@ def flake_delete(context, data_dict):
 
 
 @action
+@tk.side_effect_free
 @validate(schema.flake_lookup)
 def flake_lookup(context, data_dict):
     """Search flake by name.
@@ -160,6 +163,7 @@ def flake_lookup(context, data_dict):
 
 
 @action
+@tk.side_effect_free
 @validate(schema.flake_validate)
 def flake_validate(context, data_dict):
     """Validate existing flake
@@ -184,6 +188,7 @@ def flake_validate(context, data_dict):
 
 
 @action
+@tk.side_effect_free
 @validate(schema.data_validate)
 def data_validate(context, data_dict):
     """Validate arbitrary data against the schema.
