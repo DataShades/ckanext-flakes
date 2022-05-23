@@ -247,9 +247,23 @@ class TestFlakeValidate:
             "flakes_data_validate", data=flake["data"], schema=schema
         )
 
-    def test_expanded(self):
-        # TODO: spent another 1.5 minutes on this test
-        pass
+    def test_expanded(self, flake, flake_factory):
+        child = flake_factory(parent_id=flake["id"], data={"hello": "world"})
+
+        result = call_action(
+            "flakes_flake_validate", id=child["id"], schema="empty"
+        )
+        assert result["data"] == {"__extras": {"hello": "world"}}
+
+        result = call_action(
+            "flakes_flake_validate",
+            id=child["id"],
+            schema="empty",
+            expand=True,
+        )
+        assert result["data"] == {
+            "__extras": {**flake["data"], **{"hello": "world"}}
+        }
 
 
 @pytest.mark.ckan_config("ckan.plugins", "flakes flakes_test")
@@ -260,3 +274,113 @@ class TestDataValidate:
         result = call_action("flakes_data_validate", data=data, schema="empty")
 
         assert result == {"errors": {}, "data": {"__extras": data}}
+
+
+@pytest.mark.ckan_config("ckan.plugins", "flakes flakes_test")
+@pytest.mark.usefixtures("with_plugins", "clean_db")
+class TestFlakeMaterialize:
+    def test_missing(self):
+        with pytest.raises(tk.ObjectNotFound):
+            call_action(
+                "flakes_flake_materialize",
+                id="not-real",
+                action="package_create",
+            )
+
+    def test_package_create(self, flake_factory):
+        flake = flake_factory(data={"name": "flake-pkg"})
+        result = call_action(
+            "flakes_flake_materialize", id=flake["id"], action="package_create"
+        )
+
+        assert result == call_action("package_show", id=result["id"])
+        assert flake == call_action("flakes_flake_show", id=flake["id"])
+
+    def test_package_patch(self, flake_factory, package):
+        flake = flake_factory(data={"name": "flake-pkg", "id": package["id"]})
+        result = call_action(
+            "flakes_flake_materialize", id=flake["id"], action="package_patch"
+        )
+
+        assert result == call_action("package_show", id=package["id"])
+        assert result["name"] == "flake-pkg"
+
+    def test_flake_removal(self, flake_factory):
+        flake = flake_factory(data={"name": "flake-pkg"})
+        call_action(
+            "flakes_flake_materialize",
+            id=flake["id"],
+            action="package_create",
+            remove=True,
+        )
+
+        with pytest.raises(tk.ObjectNotFound):
+            call_action("flakes_flake_show", id=flake["id"])
+
+    def test_expanded(self, flake_factory):
+        parent = flake_factory(data={"title": "parent"})
+        child = flake_factory(data={"name": "child"}, parent_id=parent["id"])
+
+        slim = call_action(
+            "flakes_flake_materialize", id=child["id"], action="package_create"
+        )
+
+        assert slim["name"] == "child"
+        assert slim["title"] != "parent"
+        slim = call_action(
+            "flakes_flake_update", id=child["id"], data={"id": slim["id"]}
+        )
+
+        expanded = call_action(
+            "flakes_flake_materialize",
+            id=child["id"],
+            action="package_patch",
+            expand=True,
+        )
+        assert expanded["name"] == "child"
+        assert expanded["title"] == "parent"
+
+
+@pytest.mark.ckan_config("ckan.plugins", "flakes flakes_test")
+@pytest.mark.usefixtures("with_plugins", "clean_db")
+class TestFlakeCombine:
+    def test_one_missing(self, flake):
+        with pytest.raises(tk.ObjectNotFound):
+            call_action("flakes_flake_combine", id=[flake["id"], "not-real"])
+
+    def test_empty(self, flake):
+        result = call_action("flakes_flake_combine", id=[])
+        assert result == {}
+
+    def test_order(self, flake_factory):
+        first = flake_factory()
+        second = flake_factory()
+
+        result = call_action(
+            "flakes_flake_combine", id=[first["id"], second["id"]]
+        )
+        assert result == {**second["data"], **first["data"]}
+
+        result = call_action(
+            "flakes_flake_combine", id=[second["id"], first["id"]]
+        )
+        assert result == {**first["data"], **second["data"]}
+
+    def test_expand(self, flake_factory):
+        parent = flake_factory()
+        child = flake_factory(parent_id=parent["id"])
+
+        result = call_action("flakes_flake_combine", id=[child["id"]])
+        assert result == child["data"]
+
+        result = call_action(
+            "flakes_flake_combine", id=[child["id"]], expand={"not-real": True}
+        )
+        assert result == child["data"]
+
+        result = call_action(
+            "flakes_flake_combine",
+            id=[child["id"]],
+            expand={child["id"]: True},
+        )
+        assert result == {**parent["data"], **child["data"]}

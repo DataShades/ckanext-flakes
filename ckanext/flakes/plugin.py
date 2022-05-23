@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from typing import Any, Optional
+
 import ckan.plugins as p
 
-from .logic import action, auth, validators
 from .interfaces import IFlakes
+from .logic import action, auth, validators
 
 
 class FlakesPlugin(p.SingletonPlugin):
