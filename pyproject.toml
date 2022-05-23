@@ -1,7 +1,8 @@
 [tool.towncrier]
-# package = "flakes"
-# package_dir = "ckanext"
+package = "flakes"
+package_dir = "ckanext"
 name = "ckanext-flakes"
 directory = "changes"
 issue_format = ""
 wrap = true
+filename = "CHANGELOG.rst"
