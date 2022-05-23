@@ -11,12 +11,20 @@ from ..model import Flake
 
 auth, get_auth = Collector("flakes").split()
 
+CONFIG_CREATION_ALLOWED = "ckanext.flakes.creation.allowed"
 CONFIG_VALIDATION_ALLOWED = "ckanext.flakes.validation.allowed"
+
+DEFAULT_CREATION_ALLOWED = True
 DEFAULT_VALIDATION_ALLOWED = False
 
 
 @auth
 def flake_create(context, data_dict):
+    if not tk.asbool(
+        tk.config.get(CONFIG_CREATION_ALLOWED, DEFAULT_CREATION_ALLOWED)
+    ):
+        return {"success": False}
+
     author = context["model"].User.get(context["user"])
 
     if "parent_id" in data_dict:
@@ -29,7 +37,7 @@ def flake_create(context, data_dict):
         if not parent or parent.author_id != author.id:
             return {"success": False}
 
-    return is_authorized("package_create", context, {})
+    return {"success": True}
 
 
 def _valdiation_allowed():
@@ -51,6 +59,11 @@ def flake_show(context, data_dict):
 @auth
 def flake_update(context, data_dict):
     return {"success": _owns_flake(context, data_dict["id"])}
+
+
+@auth
+def flake_override(context, data_dict):
+    return is_authorized("flakes_flake_create", context, data_dict)
 
 
 @auth
@@ -88,4 +101,15 @@ def flake_materialize(context, data_dict):
 
 @auth
 def flake_combine(context, data_dict):
-    return {"success": True}
+    return {
+        "success": all(_owns_flake(context, id_) for id_ in data_dict["id"])
+    }
+
+
+@auth
+def flake_merge(context, data_dict):
+    ids: list[str] = list(data_dict["id"])
+    if "destination" in data_dict:
+        ids.append(data_dict["destination"])
+
+    return {"success": all(_owns_flake(context, id_) for id_ in ids)}

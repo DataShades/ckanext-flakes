@@ -27,9 +27,10 @@ def flake_update(
     dict_only,
     ignore,
     ignore_missing,
+    unicode_safe,
 ):
     return {
-        "id": [not_missing],
+        "id": [not_missing, unicode_safe],
         "data": [not_missing, convert_to_json_if_string, dict_only],
         "parent_id": [ignore_missing],
         "extras": [ignore_missing, convert_to_json_if_string, dict_only],
@@ -38,16 +39,24 @@ def flake_update(
 
 
 @validator_args
-def flake_delete(not_missing):
+def flake_override(not_missing, unicode_safe):
+    schema = flake_update()
+    schema.pop("id")
+    schema["name"] = [not_missing, unicode_safe]
+    return schema
+
+
+@validator_args
+def flake_delete(not_missing, unicode_safe):
     return {
-        "id": [not_missing],
+        "id": [not_missing, unicode_safe],
     }
 
 
 @validator_args
-def flake_show(not_missing, boolean_validator):
+def flake_show(not_missing, boolean_validator, unicode_safe):
     return {
-        "id": [not_missing],
+        "id": [not_missing, unicode_safe],
         "expand": [boolean_validator],
     }
 
@@ -60,17 +69,17 @@ def flake_list(boolean_validator):
 
 
 @validator_args
-def flake_lookup(boolean_validator, not_missing):
+def flake_lookup(boolean_validator, not_missing, unicode_safe):
     return {
-        "name": [not_missing],
+        "name": [not_missing, unicode_safe],
         "expand": [boolean_validator],
     }
 
 
 @validator_args
-def flake_validate(boolean_validator, not_missing):
+def flake_validate(boolean_validator, not_missing, unicode_safe):
     return {
-        "id": [not_missing],
+        "id": [not_missing, unicode_safe],
         "expand": [boolean_validator],
         "schema": [not_missing],
     }
@@ -85,9 +94,11 @@ def data_validate(convert_to_json_if_string, dict_only, not_missing):
 
 
 @validator_args
-def flake_materialize(boolean_validator, not_missing, flakes_into_api_action):
+def flake_materialize(
+    boolean_validator, not_missing, flakes_into_api_action, unicode_safe
+):
     return {
-        "id": [not_missing],
+        "id": [not_missing, unicode_safe],
         "expand": [boolean_validator],
         "remove": [boolean_validator],
         "action": [not_missing, flakes_into_api_action],
@@ -106,3 +117,11 @@ def flake_combine(
         "id": [not_missing, json_list_or_string],
         "expand": [default("{}"), convert_to_json_if_string, dict_only],
     }
+
+
+@validator_args
+def flake_merge(boolean_validator, ignore_missing):
+    schema = flake_combine()
+    schema["remove"] = [boolean_validator]
+    schema["destination"] = [ignore_missing]
+    return schema

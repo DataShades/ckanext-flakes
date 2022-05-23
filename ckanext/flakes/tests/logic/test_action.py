@@ -101,6 +101,31 @@ class TestFlakeUpdate:
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
+class TestFlakeOverride:
+    def test_user_can_override_new(self, user):
+        overriden = call_action(
+            "flakes_flake_override",
+            {"user": user["name"]},
+            name="flake",
+            data={"hello": "world"},
+        )
+        assert overriden["name"] == "flake"
+        assert overriden["data"] == {"hello": "world"}
+
+    def test_user_can_override_existing(self, user, flake_factory):
+        flake = flake_factory(user=user, name="flake")
+
+        overriden = call_action(
+            "flakes_flake_override",
+            {"user": user["name"]},
+            name=flake["name"],
+            data={"hello": "world"},
+        )
+        assert overriden["id"] == flake["id"]
+        assert overriden["data"] == {"hello": "world"}
+
+
+@pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestFlakeDelete:
     def test_base(self, flake):
         call_action("flakes_flake_delete", id=flake["id"])
@@ -276,7 +301,6 @@ class TestDataValidate:
         assert result == {"errors": {}, "data": {"__extras": data}}
 
 
-@pytest.mark.ckan_config("ckan.plugins", "flakes flakes_test")
 @pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestFlakeMaterialize:
     def test_missing(self):
@@ -341,7 +365,6 @@ class TestFlakeMaterialize:
         assert expanded["title"] == "parent"
 
 
-@pytest.mark.ckan_config("ckan.plugins", "flakes flakes_test")
 @pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestFlakeCombine:
     def test_one_missing(self, flake):
@@ -384,3 +407,54 @@ class TestFlakeCombine:
             expand={child["id"]: True},
         )
         assert result == {**parent["data"], **child["data"]}
+
+
+@pytest.mark.usefixtures("with_plugins", "clean_db")
+class TestFlakeMerge:
+    def test_new(self, flake_factory, user):
+        flake = flake_factory(user=user)
+        new = call_action(
+            "flakes_flake_merge", {"user": user["name"]}, id=[flake["id"]]
+        )
+        assert new["id"] != flake["id"]
+        assert new["data"] == flake["data"]
+
+    def test_missing_destination(self, user, flake_factory):
+        flake = flake_factory(user=user)
+        with pytest.raises(tk.ObjectNotFound):
+            call_action(
+                "flakes_flake_merge",
+                {"user": user["name"]},
+                id=[flake["id"]],
+                destination="not-real",
+            )
+
+    def test_destination(self, user, flake_factory):
+        flake = flake_factory(user=user)
+        dest = flake_factory(user=user)
+        new = call_action(
+            "flakes_flake_merge",
+            {"user": user["name"]},
+            id=[flake["id"]],
+            destination=dest["id"],
+        )
+
+        assert new["id"] == dest["id"]
+        assert new["data"] == flake["data"]
+
+    def test_remove(self, flake_factory, user):
+        flake = flake_factory(user=user)
+        new = call_action(
+            "flakes_flake_merge",
+            {"user": user["name"]},
+            id=[flake["id"]],
+            remove=True,
+        )
+
+        assert call_action(
+            "flakes_flake_show", {"user": user["name"]}, id=new["id"]
+        )
+        with pytest.raises(tk.ObjectNotFound):
+            call_action(
+                "flakes_flake_show", {"user": user["name"]}, id=flake["id"]
+            )

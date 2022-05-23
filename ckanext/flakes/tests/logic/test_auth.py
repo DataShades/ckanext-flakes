@@ -14,11 +14,13 @@ from ckanext.flakes.logic.auth import CONFIG_VALIDATION_ALLOWED
         "flakes_flake_show",
         "flakes_flake_list",
         "flakes_flake_update",
+        "flakes_flake_override",
         "flakes_flake_lookup",
         "flakes_flake_validate",
         "flakes_data_validate",
         "flakes_flake_materialize",
         "flakes_flake_combine",
+        "flakes_flake_merge",
     ],
 )
 def test_annon_cannot(auth):
@@ -31,13 +33,23 @@ def test_annon_cannot(auth):
     "auth",
     [
         "flakes_flake_create",
+        "flakes_flake_override",
         "flakes_flake_list",
         "flakes_flake_lookup",
-        "flakes_flake_combine",
     ],
 )
 def test_user_can(auth, user):
-    assert call_auth("flakes_flake_create", {"user": user["name"]})
+    assert call_auth(auth, {"user": user["name"]})
+
+
+@pytest.mark.usefixtures("with_plugins", "clean_db")
+def test_user_can_combine(user):
+    assert call_auth("flakes_flake_combine", {"user": user["name"]}, id=[])
+
+
+@pytest.mark.usefixtures("with_plugins", "clean_db")
+def test_user_can_merge(user):
+    assert call_auth("flakes_flake_merge", {"user": user["name"]}, id=[])
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")

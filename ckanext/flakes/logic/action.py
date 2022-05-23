@@ -131,6 +131,31 @@ def flake_update(context, data_dict):
 
 
 @action
+@validate(schema.flake_override)
+def flake_override(context, data_dict):
+    """Update existing flake by name or create a new one.
+
+    Args:
+        name (str): Name flake to override
+        data (dict): template itself
+        parent_id (str, optional): ID of flake to extend
+    """
+
+    tk.check_access("flakes_flake_override", context, data_dict)
+    try:
+        flake = tk.get_action("flakes_flake_lookup")(
+            context.copy(), {"name": data_dict["name"]}
+        )
+    except tk.ObjectNotFound:
+        action = tk.get_action("flakes_flake_create")
+    else:
+        action = tk.get_action("flakes_flake_update")
+        data_dict["id"] = flake["id"]
+
+    return action(context, data_dict)
+
+
+@action
 @validate(schema.flake_delete)
 def flake_delete(context, data_dict):
     """Delete existing flake
@@ -258,6 +283,7 @@ def flake_materialize(context, data_dict):
 
 
 @action
+@tk.side_effect_free
 @validate(schema.flake_combine)
 def flake_combine(context, data_dict):
     """Combine and show data from multiple flakes
@@ -290,3 +316,48 @@ def flake_combine(context, data_dict):
     result = ChainMap(*(flake["data"] for flake in flakes))
 
     return dict(result)
+
+
+@action
+@validate(schema.flake_merge)
+def flake_merge(context, data_dict):
+    """Combine multiple flakes and save the result.
+
+    Args:
+        id (list): IDs of flakes.
+        expand (dict, optional): Extend flake using data from the parent flakes
+        remove (bool, optional): Remove flakes after the operation.
+        destination (str, optional): Save data into the specified flake instead
+            of a new one
+    """
+
+    tk.check_access("flakes_flake_merge", context, data_dict)
+
+    data = tk.get_action("flakes_flake_combine")(
+        context.copy(),
+        {
+            "id": data_dict["id"],
+            "expand": data_dict["expand"],
+        },
+    )
+
+    payload = {"data": data}
+    action = tk.get_action("flakes_flake_create")
+
+    if "destination" in data_dict:
+        action = tk.get_action("flakes_flake_update")
+        payload["id"] = data_dict["destination"]
+
+    result = action(context.copy(), payload)
+
+    delete = tk.get_action("flakes_flake_delete")
+    if data_dict["remove"]:
+        for id_ in data_dict["id"]:
+            try:
+                delete(context.copy(), {"id": id_})
+            except tk.ObjectNotFound:
+                # This flake was a child of another flake in queue and was
+                # removed recursively
+                pass
+
+    return result
