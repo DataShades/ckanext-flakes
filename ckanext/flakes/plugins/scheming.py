@@ -26,9 +26,14 @@ def _get_schemas(fields: str, entity: str, category: str) -> dict[str, Any]:
     """Convert entity schemas from scheming into validation schemas."""
     from ckanext.scheming.plugins import _field_create_validators
 
-    types = tk.get_action(f"scheming_{entity}_schema_list")(
-        {"ignore_auth": True}, {}
-    )
+    try:
+        types = tk.get_action(f"scheming_{entity}_schema_list")(
+            {"ignore_auth": True}, {}
+        )
+    except KeyError:
+        # Corresponding scheming plugin is not enabled
+        return {}
+
     schemas = {}
     for type_ in types:
         schema = tk.get_action(f"scheming_{entity}_schema_show")(
