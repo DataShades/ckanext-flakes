@@ -10,6 +10,8 @@ from ..interfaces import IFlakes
 class FlakesSchemingPlugin(p.SingletonPlugin):
     p.implements(IFlakes)
 
+    # IFlakes
+
     def get_flake_schemas(self):
         return {
             **_get_schemas("fields", "organization", "organization"),
@@ -20,6 +22,9 @@ class FlakesSchemingPlugin(p.SingletonPlugin):
 
 
 def _get_schemas(fields: str, entity: str, category: str) -> dict[str, Any]:
+    """Convert entity schemas from scheming into validation schemas.
+
+    """
     from ckanext.scheming.plugins import _field_create_validators
 
     types = tk.get_action(f"scheming_{entity}_schema_list")({"ignore_auth": True}, {})

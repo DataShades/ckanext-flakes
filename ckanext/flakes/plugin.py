@@ -25,9 +25,15 @@ class FlakesPlugin(p.SingletonPlugin):
         return validators.get_validators()
 
     def configure(self, config):
+        # reset schema cache whenever plugins are reloaded
         self._flake_schemas = None
 
-    def resolve_flake_schema(self, name: str) -> Optional[Any]:
+    def resolve_flake_schema(self, name: str) -> Optional[dict[str, Any]]:
+        """Return named validation schema.
+
+        Raises:
+            KeyError: schema with the given name is not registered.
+        """
         if self._flake_schemas is None:
             schemas = {}
             for plugin in p.PluginImplementations(IFlakes):

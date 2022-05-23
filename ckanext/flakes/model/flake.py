@@ -39,7 +39,13 @@ class Flake(Base):
         remote_side=[id],
     )
 
-    def dictize(self, context: dict[str, Any]):
+    def dictize(self, context: dict[str, Any]) -> dict[str, Any]:
+        """Convert Flake into a serializable dictionary,
+
+        If `expand` context flag is set, expand flake's data using the chaing
+        of parent flakes.
+
+        """
         result = table_dictize(self, context)
 
         if context.get("expand"):
@@ -56,6 +62,8 @@ class Flake(Base):
 
     @classmethod
     def by_name(cls, name: str, author_id: str) -> Optional[Self]:
+        """Get user's flake using unique name of flake.
+        """
         return (
             model.Session.query(cls)
             .filter_by(name=name, author_id=author_id)

@@ -22,6 +22,7 @@ def flake_create(context, data_dict):
         name (str, optional): name of the flake
         data (dict): template itself
         parent_id (str, optional): ID of flake to extend
+
     """
 
     tk.check_access("flakes_flake_create", context, data_dict)
@@ -210,6 +211,8 @@ def data_validate(context, data_dict):
 
 
 def _get_schema(name: str) -> dict[str, Any]:
+    """Get named validation schema for flake's data.
+    """
     plugin = get_plugin("flakes")
     schema = plugin.resolve_flake_schema(name)
     return schema

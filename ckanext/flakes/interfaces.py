@@ -13,5 +13,11 @@ class IFlakes(Interface):
 
         Returns:
             Mapping of names to the corresponding validation schemas.
+
+        Example:
+            def get_flake_schemas(self) -> dict[str, dict[str, Any]]:
+                return {
+                    "name-only": {"name": [not_missing]}
+                }
         """
         return {}
