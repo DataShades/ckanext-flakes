@@ -29,11 +29,12 @@ def flake_update(
     ignore,
     ignore_missing,
     unicode_safe,
+    flakes_flake_id_exists,
 ):
     return {
         "id": [not_missing, unicode_safe],
         "data": [not_missing, convert_to_json_if_string, dict_only],
-        "parent_id": [ignore_missing],
+        "parent_id": [ignore_missing, flakes_flake_id_exists],
         "extras": [ignore_missing, convert_to_json_if_string, dict_only],
         "__extras": [ignore],
     }

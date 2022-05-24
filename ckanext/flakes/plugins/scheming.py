@@ -9,7 +9,7 @@ from ..interfaces import IFlakes
 
 
 class FlakesSchemingPlugin(p.SingletonPlugin):
-    p.implements(IFlakes)
+    p.implements(IFlakes, inherit=True)
 
     # IFlakes
 

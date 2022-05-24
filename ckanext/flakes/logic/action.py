@@ -22,8 +22,9 @@ def flake_create(context, data_dict):
 
     Args:
         name (str, optional): name of the flake
-        data (dict): template itself
+        data (dict): flake's data
         parent_id (str, optional): ID of flake to extend
+        extras (dict): flake's extra details
 
     """
 
@@ -131,8 +132,9 @@ def flake_update(context, data_dict):
 
     Args:
         id (str): ID of flake to update
-        data (dict): template itself
+        data (dict): flake's data
         parent_id (str, optional): ID of flake to extend
+        extras (dict): flake's extra details
     """
 
     tk.check_access("flakes_flake_update", context, data_dict)
@@ -157,8 +159,9 @@ def flake_override(context, data_dict):
 
     Args:
         name (str): Name flake to override
-        data (dict): template itself
+        data (dict): flakes data
         parent_id (str, optional): ID of flake to extend
+        extras (dict): flake's extra details
     """
 
     tk.check_access("flakes_flake_override", context, data_dict)
@@ -181,7 +184,7 @@ def flake_delete(context, data_dict):
     """Delete existing flake
 
     Args:
-        id (str): ID of flake to update
+        id (str): ID of flake to delete
     """
 
     tk.check_access("flakes_flake_delete", context, data_dict)
@@ -224,6 +227,8 @@ def flake_lookup(context, data_dict):
 def flake_validate(context, data_dict):
     """Validate existing flake
 
+    Schemas must be registered via `IFlakes` interface.
+
     Args:
         id (str): ID of flake to validate
         expand (bool, optional): Extend flake using data from the parent flakes
@@ -248,6 +253,8 @@ def flake_validate(context, data_dict):
 @validate(schema.data_validate)
 def data_validate(context, data_dict):
     """Validate arbitrary data against the schema.
+
+    Factories must be registered via `IFlakes` interface.
 
     Args:
         data (dict): data that needs to be validated
@@ -297,10 +304,10 @@ def data_example(context, data_dict):
 @action
 @validate(schema.flake_materialize)
 def flake_materialize(context, data_dict):
-    """Display existing flake
+    """Send flake's data to API action.
 
     Args:
-        id (str): ID of flake to display
+        id (str): ID of flake to materialize
         expand (bool, optional): Extend flake using data from the parent flakes
         remove (bool, optional): Remove flake after materialization
         action (str): API action to use for materialization
@@ -331,12 +338,12 @@ def flake_combine(context, data_dict):
     """Combine and show data from multiple flakes
 
     `id` argument specifies all the flakes that must be combined. All of the
-    flakes must exist, otherwise NotFound error raised. IDs at the start of the
-    list have higher priority(override matching keys). IDs at the end of the
-    list have lower priority(can be shadowed by former flakes).
+    flakes must exist, otherwise `NotFound` error raised. IDs at the start of
+    the list have higher priority(override matching keys). IDs at the end of
+    the list have lower priority(can be shadowed by former flakes).
 
-    `expand` must be a dict[str, bool]. Keys are IDs of the flakes, values are
-    expand flags for the corresponding flake.
+    `expand` must be a `dict[str, bool]`. Keys are IDs of the flakes, values
+    are expand flags for the corresponding flake.
 
     Args:
         id (list): IDs of flakes.
@@ -395,6 +402,10 @@ def flake_merge(context, data_dict):
     delete = tk.get_action("flakes_flake_delete")
     if data_dict["remove"]:
         for id_ in data_dict["id"]:
+            if id_ == result["id"]:
+                # we've merged data into this flake
+                continue
+
             try:
                 delete(context.copy(), {"id": id_})
             except tk.ObjectNotFound:
