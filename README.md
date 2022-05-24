@@ -180,10 +180,6 @@ class IFlakes(Interface):
 
 ## API
 
-<a id="api-flakes_flake_validate"></a>
-<a id="api-flakes_flake_combine"></a>
-<a id="api-flakes_flake_merge"></a>
-
 ### <a id="api-flakes_flake_create"></a> `flakes_flake_create`
 
 Create flake.
