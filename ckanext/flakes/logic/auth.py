@@ -95,6 +95,11 @@ def data_validate(context, data_dict):
 
 
 @auth
+def data_example(context, data_dict):
+    return {"success": _valdiation_allowed()}
+
+
+@auth
 def flake_materialize(context, data_dict):
     return {"success": _owns_flake(context, data_dict["id"])}
 

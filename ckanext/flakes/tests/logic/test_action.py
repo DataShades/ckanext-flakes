@@ -288,7 +288,10 @@ class TestFlakeValidate:
         child = flake_factory(parent_id=flake["id"], data={"hello": "world"})
 
         result = call_action(
-            "flakes_flake_validate", {"include_data": True}, id=child["id"], schema="empty"
+            "flakes_flake_validate",
+            {"include_data": True},
+            id=child["id"],
+            schema="empty",
         )
         assert result["data"] == {"__extras": {"hello": "world"}}
 
@@ -309,9 +312,38 @@ class TestFlakeValidate:
 class TestDataValidate:
     def test_base(self):
         data = {"hello": "world"}
-        result = call_action("flakes_data_validate", {"include_data": True}, data=data, schema="empty")
+        result = call_action(
+            "flakes_data_validate",
+            {"include_data": True},
+            data=data,
+            schema="empty",
+        )
 
         assert result == {"errors": {}, "data": {"__extras": data}}
+
+    def test_missing_schema(self):
+        with pytest.raises(tk.ValidationError):
+            call_action(
+                "flakes_data_validate", data={}, schema="not-a-real-schema"
+            )
+
+
+@pytest.mark.ckan_config("ckan.plugins", "flakes flakes_test")
+@pytest.mark.usefixtures("with_plugins")
+class TestDataExample:
+    def test_base(self):
+        data = {"hello": "world"}
+
+        result = call_action(
+            "flakes_data_example", data=data, factory="identity"
+        )
+        assert result == {"data": data}
+
+    def test_missing_schema(self):
+        with pytest.raises(tk.ValidationError):
+            call_action(
+                "flakes_data_example", data={}, factory="not-a-real-factory"
+            )
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")

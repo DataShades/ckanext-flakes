@@ -21,3 +21,20 @@ class IFlakes(Interface):
                 }
         """
         return {}
+
+    def get_flake_factories(self) -> dict[str, dict[str, Any]]:
+        """Register named example factories.
+
+        Returns:
+            Mapping of names to the corresponding validation factories.
+
+        Example:
+            def get_flake_factories(self) -> dict[str, dict[str, Any]]:
+                def factory(payload: dict[str, Any]):
+                    return {"field": "value"}
+
+                return {
+                    "test-factory": factory
+                }
+        """
+        return {}

@@ -256,7 +256,11 @@ def data_validate(context, data_dict):
 
     tk.check_access("flakes_data_validate", context, data_dict)
 
-    schema = _get_schema(data_dict["schema"])
+    plugin = get_plugin("flakes")
+    try:
+        schema = plugin.resolve_flake_schema(data_dict["schema"])
+    except KeyError:
+        raise tk.ValidationError({"schema": ["Does not exist"]})
     data, errors = tk.navl_validate(data_dict["data"], schema, context)
 
     result = {
@@ -268,11 +272,26 @@ def data_validate(context, data_dict):
     return result
 
 
-def _get_schema(name: str) -> dict[str, Any]:
-    """Get named validation schema for flake's data."""
+@action
+@tk.side_effect_free
+@validate(schema.data_example)
+def data_example(context, data_dict):
+    """Generate an example of the flake's data using named factory.
+
+    Args:
+        factory(str): example factory
+        data (dict, optional): payload for the example factory
+    """
+
+    tk.check_access("flakes_example", context, data_dict)
+
     plugin = get_plugin("flakes")
-    schema = plugin.resolve_flake_schema(name)
-    return schema
+    try:
+        factory = plugin.resolve_example_factory(data_dict["factory"])
+    except KeyError:
+        raise tk.ValidationError({"factory": ["Does not exist"]})
+
+    return {"data": factory(data_dict["data"])}
 
 
 @action

@@ -99,6 +99,14 @@ def data_validate(convert_to_json_if_string, dict_only, not_missing):
 
 
 @validator_args
+def data_example(not_missing, convert_to_json_if_string, dict_only, default):
+    return {
+        "factory": [not_missing],
+        "data": [default("{}"), convert_to_json_if_string, dict_only],
+    }
+
+
+@validator_args
 def flake_materialize(
     boolean_validator, not_missing, flakes_into_api_action, unicode_safe
 ):

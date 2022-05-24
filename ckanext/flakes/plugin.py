@@ -15,6 +15,7 @@ class FlakesPlugin(p.SingletonPlugin):
     p.implements(p.IValidators)
 
     _flake_schemas: Optional[dict[str, Any]] = None
+    _flake_factories: Optional[dict[str, Any]] = None
 
     def get_actions(self):
         return action.get_actions()
@@ -29,7 +30,7 @@ class FlakesPlugin(p.SingletonPlugin):
         # reset schema cache whenever plugins are reloaded
         self._flake_schemas = None
 
-    def resolve_flake_schema(self, name: str) -> Optional[dict[str, Any]]:
+    def resolve_flake_schema(self, name: str) -> dict[str, Any]:
         """Return named validation schema.
 
         Raises:
@@ -42,3 +43,17 @@ class FlakesPlugin(p.SingletonPlugin):
             self._flake_schemas = schemas
 
         return self._flake_schemas[name]
+
+    def resolve_example_factory(self, name: str) -> dict[str, Any]:
+        """Return named example factory.
+
+        Raises:
+            KeyError: schema with the given name is not registered.
+        """
+        if self._flake_factories is None:
+            schemas = {}
+            for plugin in p.PluginImplementations(IFlakes):
+                schemas.update(plugin.get_flake_factories())
+            self._flake_factories = schemas
+
+        return self._flake_factories[name]

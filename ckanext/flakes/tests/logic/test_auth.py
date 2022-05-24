@@ -18,6 +18,7 @@ from ckanext.flakes.logic.auth import CONFIG_VALIDATION_ALLOWED
         "flakes_flake_lookup",
         "flakes_flake_validate",
         "flakes_data_validate",
+        "flakes_data_example",
         "flakes_flake_materialize",
         "flakes_flake_combine",
         "flakes_flake_merge",
@@ -146,6 +147,17 @@ class TestDataValidate:
     @pytest.mark.ckan_config(CONFIG_VALIDATION_ALLOWED, True)
     def test_can_validate_when_allowed(self, user):
         assert call_auth("flakes_data_validate", {"user": user["name"]})
+
+
+@pytest.mark.usefixtures("with_plugins")
+class TestDataExample:
+    def test_cannot_example_by_default(self, user):
+        with pytest.raises(tk.NotAuthorized):
+            call_auth("flakes_data_example", {"user": user["name"]})
+
+    @pytest.mark.ckan_config(CONFIG_VALIDATION_ALLOWED, True)
+    def test_can_example_when_allowed(self, user):
+        assert call_auth("flakes_data_example", {"user": user["name"]})
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
