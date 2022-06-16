@@ -503,3 +503,24 @@ class TestFlakeMerge:
             call_action(
                 "flakes_flake_show", {"user": user["name"]}, id=flake["id"]
             )
+
+@pytest.mark.usefixtures("with_plugins", "clean_db")
+class TestDataPatch:
+    def test_new(self, flake_factory, user):
+        flake = flake_factory(user=user)
+        patched = call_action(
+            "flakes_data_patch", {"user": user["name"]}, id=flake["id"], data={"hey": "ho"}
+        )
+
+        assert patched["data"] == dict(flake["data"], hey="ho")
+
+
+@pytest.mark.usefixtures("with_plugins", "clean_db")
+class TestExtrasPatch:
+    def test_new(self, flake_factory, user):
+        flake = flake_factory(user=user)
+        patched = call_action(
+            "flakes_extras_patch", {"user": user["name"]}, id=flake["id"], extras={"hey": "ho"}
+        )
+
+        assert patched["extras"] == dict(flake["extras"], hey="ho")

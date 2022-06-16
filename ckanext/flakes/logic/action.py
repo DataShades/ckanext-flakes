@@ -414,3 +414,40 @@ def flake_merge(context, data_dict):
                 pass
 
     return result
+
+
+@action
+@validate(schema.extras_patch)
+def extras_patch(context, data_dict):
+    """Partially overrides extras leaving other fields intact.
+
+    Args:
+        id (str): ID of flake
+        extras (dict): patch for extras
+
+    """
+    tk.check_access("flakes_extras_patch", context, data_dict)
+
+    flake = tk.get_action("flakes_flake_show")(context.copy(), data_dict)
+    flake["extras"].update(data_dict["extras"])
+
+    return tk.get_action("flakes_flake_update")(context, flake)
+
+
+
+@action
+@validate(schema.data_patch)
+def data_patch(context, data_dict):
+    """Partially overrides data leaving other fields intact.
+
+    Args:
+        id (str): ID of flake
+        data (dict): patch for data
+
+    """
+    tk.check_access("flakes_data_patch", context, data_dict)
+
+    flake = tk.get_action("flakes_flake_show")(context.copy(), data_dict)
+    flake["data"].update(data_dict["data"])
+
+    return tk.get_action("flakes_flake_update")(context, flake)

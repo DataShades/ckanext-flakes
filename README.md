@@ -333,6 +333,25 @@ Args:
     remove (bool, optional): Remove flakes after the operation.
     destination (str, optional): Save data into the specified flake instead of a new one
 
+### <a id="api-flakes_data_patch"></a> `flakes_data_patch`
+
+Partially overrides data leaving other fields intact.
+
+Args:
+
+    id (str): ID of flake
+    data (dict): patch for data
+
+
+### <a id="api-flakes_extras_patch"></a> `flakes_extras_patch`
+
+Partially overrides extras leaving other fields intact.
+
+Args:
+
+    id (str): ID of flake
+    extras (dict): patch for extras
+
 ## Developer installation
 
 To install ckanext-flakes for development, activate your CKAN virtualenv and

@@ -22,6 +22,8 @@ from ckanext.flakes.logic.auth import CONFIG_VALIDATION_ALLOWED
         "flakes_flake_materialize",
         "flakes_flake_combine",
         "flakes_flake_merge",
+        "flakes_data_patch",
+        "flakes_extras_patch",
     ],
 )
 def test_annon_cannot(auth):
@@ -66,6 +68,38 @@ class TestFlakeUpdate:
         with pytest.raises(tk.NotAuthorized):
             call_auth(
                 "flakes_flake_update", {"user": user["name"]}, id=flake["id"]
+            )
+
+
+@pytest.mark.usefixtures("with_plugins", "clean_db")
+class TestDataPatch:
+    def test_user_can_patch(self, user_factory, flake_factory):
+        user = user_factory()
+        author = user_factory()
+        flake = flake_factory(user=author)
+
+        assert call_auth(
+            "flakes_data_patch", {"user": author["name"]}, id=flake["id"], data={}
+        )
+        with pytest.raises(tk.NotAuthorized):
+            call_auth(
+                "flakes_data_patch", {"user": user["name"]}, id=flake["id"], data={}
+            )
+
+
+@pytest.mark.usefixtures("with_plugins", "clean_db")
+class TestExtrasPatch:
+    def test_user_can_patch(self, user_factory, flake_factory):
+        user = user_factory()
+        author = user_factory()
+        flake = flake_factory(user=author)
+
+        assert call_auth(
+            "flakes_extras_patch", {"user": author["name"]}, id=flake["id"], extras={}
+        )
+        with pytest.raises(tk.NotAuthorized):
+            call_auth(
+                "flakes_extras_patch", {"user": user["name"]}, id=flake["id"], extras={}
             )
 
 

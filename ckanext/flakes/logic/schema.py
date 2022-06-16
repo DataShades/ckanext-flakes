@@ -139,3 +139,28 @@ def flake_merge(boolean_validator, ignore_missing):
     schema["remove"] = [boolean_validator]
     schema["destination"] = [ignore_missing]
     return schema
+
+
+@validator_args
+def extras_patch(
+    not_missing,
+    convert_to_json_if_string,
+    dict_only,
+    unicode_safe,
+):
+    return {
+        "id": [not_missing, unicode_safe],
+        "extras": [not_missing, convert_to_json_if_string, dict_only],
+    }
+
+@validator_args
+def data_patch(
+    not_missing,
+    convert_to_json_if_string,
+    dict_only,
+    unicode_safe,
+):
+    return {
+        "id": [not_missing, unicode_safe],
+        "data": [not_missing, convert_to_json_if_string, dict_only],
+    }

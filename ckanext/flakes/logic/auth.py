@@ -118,3 +118,13 @@ def flake_merge(context, data_dict):
         ids.append(data_dict["destination"])
 
     return {"success": all(_owns_flake(context, id_) for id_ in ids)}
+
+
+@auth
+def extras_patch(context, data_dict):
+    return {"success": _owns_flake(context, data_dict["id"])}
+
+
+@auth
+def data_patch(context, data_dict):
+    return {"success": _owns_flake(context, data_dict["id"])}
