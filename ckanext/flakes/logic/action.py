@@ -18,7 +18,7 @@ action, get_actions = Collector("flakes").split()
 @action
 @validate(schema.flake_create)
 def flake_create(context, data_dict):
-    """Create flake that can be used as base template for dataset.
+    """Create a flake.
 
     Args:
         name (str, optional): name of the flake
@@ -66,7 +66,7 @@ def flake_create(context, data_dict):
 @tk.side_effect_free
 @validate(schema.flake_show)
 def flake_show(context, data_dict):
-    """Display existing flake
+    """Display existing flake.
 
     Args:
         id (str): ID of flake to display
@@ -128,7 +128,7 @@ def flake_list(context, data_dict):
 @action
 @validate(schema.flake_update)
 def flake_update(context, data_dict):
-    """Update existing flake
+    """Update existing flake.
 
     Args:
         id (str): ID of flake to update
@@ -181,7 +181,7 @@ def flake_override(context, data_dict):
 @action
 @validate(schema.flake_delete)
 def flake_delete(context, data_dict):
-    """Delete existing flake
+    """Delete the flake.
 
     Args:
         id (str): ID of flake to delete
@@ -205,7 +205,7 @@ def flake_delete(context, data_dict):
 @tk.side_effect_free
 @validate(schema.flake_lookup)
 def flake_lookup(context, data_dict):
-    """Search flake by name.
+    """Display the flake using its name.
 
     Args:
         name (str): Name of the flake
@@ -225,7 +225,7 @@ def flake_lookup(context, data_dict):
 @tk.side_effect_free
 @validate(schema.flake_validate)
 def flake_validate(context, data_dict):
-    """Validate existing flake
+    """Validate existing flake.
 
     Schemas must be registered via `IFlakes` interface.
 
@@ -252,7 +252,7 @@ def flake_validate(context, data_dict):
 @tk.side_effect_free
 @validate(schema.data_validate)
 def data_validate(context, data_dict):
-    """Validate arbitrary data against the schema.
+    """Validate arbitrary data against the named schema(registered via IFlakes).
 
     Factories must be registered via `IFlakes` interface.
 
@@ -283,7 +283,7 @@ def data_validate(context, data_dict):
 @tk.side_effect_free
 @validate(schema.data_example)
 def data_example(context, data_dict):
-    """Generate an example of the flake's data using named factory.
+    """Generate an example of the flake's data using named factory(registered via IFlakes).
 
     Args:
         factory(str): example factory
@@ -304,7 +304,7 @@ def data_example(context, data_dict):
 @action
 @validate(schema.flake_materialize)
 def flake_materialize(context, data_dict):
-    """Send flake's data to API action.
+    """Send flake's data to an API action.
 
     Args:
         id (str): ID of flake to materialize
@@ -335,7 +335,7 @@ def flake_materialize(context, data_dict):
 @tk.side_effect_free
 @validate(schema.flake_combine)
 def flake_combine(context, data_dict):
-    """Combine and show data from multiple flakes
+    """Combine data from multiple flakes
 
     `id` argument specifies all the flakes that must be combined. All of the
     flakes must exist, otherwise `NotFound` error raised. IDs at the start of

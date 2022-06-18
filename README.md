@@ -4,15 +4,53 @@
 
 Tools for creating and managing independent chunks of data.
 
-ℹ Whenever you see the word **flake** below, it means a record, that contains
+This extension provides a base entity for storing arbitrary data. It can be
+used in a number of cases, especially, if you don't want yet to create a brand
+new model, database migrations and tables, but you have no other options.
+
+`ckanext-flakes` gives you a set of actions for creating and managing small
+dictionary-like objects(anything, that can be serialized into JSON). If you are
+using it and want to add an extra action, feel free to create a PR or an issue
+with your suggestion.
+
+## Structure
+
+* [Requirements](#definition)
+* [Installation](#installation)
+* [Configuration](#configuration)
+* [Interfaces](#interfaces)
+* [API](#api)
+  * [`flakes_flake_create`](#flakes_flake_create)
+  * [`flakes_flake_show`](#flakes_flake_show)
+  * [`flakes_flake_lis`](#flakes_flake_lis)
+  * [`flakes_flake_update`](#flakes_flake_update)
+  * [`flakes_flake_override`](#flakes_flake_override)
+  * [`flakes_flake_delete`](#flakes_flake_delete)
+  * [`flakes_flake_lookup`](#flakes_flake_lookup)
+  * [`flakes_flake_validate`](#flakes_flake_validate)
+  * [`flakes_data_validate`](#flakes_data_validate)
+  * [`flakes_data_example`](#flakes_data_example)
+  * [`flakes_flake_materialize`](#flakes_flake_materialize)
+  * [`flakes_flake_combine`](#flakes_flake_combine)
+  * [`flakes_flake_merge`](#flakes_flake_merge)
+  * [`flakes_data_patch`](#flakes_data_patch)
+  * [`flakes_extras_patch`](#flakes_extras_patch)
+* [Examples](#examples)
+
+### Definition
+
+Whenever you see the word **flake** below, it means a record, that contains
 an arbitrary dictionary. A couple of facts:
 
+* *flakes* can be obtained only by their author. It means, you can store
+  private data there.
 * Absolutely every *flake* contains data. At least an empty dictionary. But there
   is no flake that has no data at all.
 * *Flake* can hold extra details, that are not a part of the data. Its purpose,
-  description, tags, anything. Extra details are just a separate dictionary
-  that can hold any information that is important for the *flake* but cannot
-  be placed inside the *flake*'s primary data.
+  description, tags, anything(just like `plugin_extras` inside the User
+  model). Extra details are just a separate dictionary that can hold any
+  information that is important for the *flake* but cannot be placed inside the
+  *flake*'s primary data.
 * *Flakes* belong to the user. There is no unowned *flake*. Whenever owner is
   removed, all his flakes removed as well.
 * *Flake* can have a name. Not necessary, but if you want to create a very
@@ -25,10 +63,10 @@ an arbitrary dictionary. A couple of facts:
   values. The behavior of the *flake* with a **parent** is very similar to the
   built-in `collections.ChainMap`. *Flake* can have only one parent, so there
   are no things like python's method resolution order.
-* [*Flake* can be validated](#api-flakes_flake_validate).
+* [*Flake* can be validated](#flakes_flake_validate).
 * *Flakes* can be combined. Check
-  [`flakes_flake_combine`](#api-flakes_flake_combine) and
-  [`flakes_flake_merge`](#api-flakes_flake_merge) actions below.
+  [`flakes_flake_combine`](#flakes_flake_combine) and
+  [`flakes_flake_merge`](#flakes_flake_merge) actions below.
 
 ### Where you can use it?
 
@@ -42,7 +80,7 @@ an arbitrary dictionary. A couple of facts:
   *flakes* are visible only to the owner(and sysadmin, of course), so they
   won't leak to other users. And you can use *flake*'s extra in order to set,
   for example, the task's subject and use it for filtering via
-  [`flakes_flake_list`](#api-flakes_flake_list). The only thing you need to do
+  [`flakes_flake_list`](#flakes_flake_list). The only thing you need to do
   is a UI for the TODO list. But you have to do it anyway because it must be
   styled using your app's style guidelines and branding colors.
 
@@ -54,21 +92,21 @@ an arbitrary dictionary. A couple of facts:
   But how about creating a *flake*? Put all the details into it and forget
   about the resource. Take a break or even vacation. Get back to work, and
   create a dataset. Add dataset's ID to the existing flake via
-  [`flakes_flake_update`](#api-flakes_flake_update) or
-  [`flakes_flake_override`](#api-flakes_flake_override). And turn it into a
-  resource using [`flakes_flake_materialize`](#api-flakes_flake_materialize).
+  [`flakes_flake_update`](#flakes_flake_update) or
+  [`flakes_flake_override`](#flakes_flake_override). And turn it into a
+  resource using [`flakes_flake_materialize`](#flakes_flake_materialize).
 
 * You are developing **multi-step dataset creation form**. Sounds cool. But you
   have to store different pieces of dataset somewhere. Of course, if you don't
   have an overprotective validation schema, you can just save all the parts
   inside the draft dataset. But if you do have such schema.. well, you know
   what I'll recommend, right? Just create a bunch of *flakes*, [combine them
-  into a dictionary](#api-flakes_flake_combine), and send this dictionary to
+  into a dictionary](#flakes_flake_combine), and send this dictionary to
   the `package_create`. Or [merge them into a new
-  flake](#api-flakes_flake_merge) and [materialize using API action on your
-  choice](#api-flakes_flake_materialize). Have you said
-  ["validation"](#api-flakes_data_validate)? Or you meant [another
-  "validation"](#api-flakes_flake_validate)?
+  flake](#flakes_flake_merge) and [materialize using API action on your
+  choice](#flakes_flake_materialize). Have you said
+  ["validation"](#flakes_data_validate)? Or you meant [another
+  "validation"](#flakes_flake_validate)?
 
 * How about a **user-request functionality**? User has a `state` so you can
   create a *pending* user account, that requires approval. But when somebody
@@ -116,7 +154,7 @@ To install ckanext-flakes:
 
         ckan db upgrade -p flakes
 
-## Config settings
+## Configuration
 
 	# Allow logged-in user to create flakes.
     # When disabled, only sysadmin can work with flakes.
@@ -180,9 +218,9 @@ class IFlakes(Interface):
 
 ## API
 
-### <a id="api-flakes_flake_create"></a> `flakes_flake_create`
+### `flakes_flake_create`
 
-Create flake.
+Create a flake.
 
 Args:
 
@@ -191,7 +229,7 @@ Args:
     parent_id (str, optional): ID of flake to extend
     extras (dict): flake's extra details
 
-### <a id="api-flakes_flake_show"></a> `flakes_flake_show`
+### `flakes_flake_show`
 
 Display existing flake
 
@@ -201,7 +239,7 @@ Args:
     expand (bool, optional): Extend flake using data from the parent flakes
 
 
-### <a id="api-flakes_flake_list"></a> `flakes_flake_list`
+### `flakes_flake_list`
 
 Display all flakes of the user.
 
@@ -223,7 +261,7 @@ Args:
 
 
 
-### <a id="api-flakes_flake_update"></a> `flakes_flake_update`
+### `flakes_flake_update`
 
 Update existing flake
 
@@ -234,7 +272,7 @@ Args:
     parent_id (str, optional): ID of flake to extend
     extras (dict): flake's extra details
 
-### <a id="api-flakes_flake_override"></a> `flakes_flake_override`
+### `flakes_flake_override`
 
 Update existing flake by name or create a new one.
 
@@ -245,7 +283,7 @@ Args:
     parent_id (str, optional): ID of flake to extend
     extras (dict): flake's extra details
 
-### <a id="api-flakes_flake_delete"></a> `flakes_flake_delete`
+### `flakes_flake_delete`
 
 Delete existing flake
 
@@ -253,15 +291,15 @@ Args:
 
     id (str): ID of flake to delete
 
-### <a id="api-flakes_flake_lookup"></a> `flakes_flake_lookup`
+### `flakes_flake_lookup`
 
-Search flake by name.
+Display flake using its name.
 
 Args:
 
     name (str): Name of the flake
 
-### <a id="api-flakes_flake_validate"></a> `flakes_flake_validate`
+### `flakes_flake_validate`
 
 Validate existing flake
 
@@ -274,18 +312,18 @@ Args:
     schema(str): validation schema for the flake's data
 
 
-### <a id="api-flakes_data_validate"></a> `flakes_data_validate`
+### `flakes_data_validate`
 
-Validate arbitrary data against the schema.
+Validate arbitrary data against the named schema(registered via IFlakes).
 
 Args:
 
     data (dict): data that needs to be validated
     schema(str): validation schema for the data
 
-### <a id="api-flakes_data_example"></a> `flakes_data_example`
+### `flakes_data_example`
 
-Generate an example of the flake's data using named factory.
+Generate an example of the flake's data using named factory(registered via IFlakes).
 
 Factories must be registered via `IFlakes` interface.
 
@@ -294,7 +332,7 @@ Args:
     factory(str): example factory
     data (dict, optional): payload for the example factory
 
-### <a id="api-flakes_flake_materialize"></a> `flakes_flake_materialize`
+### `flakes_flake_materialize`
 
 Send flake's data to API action.
 
@@ -305,9 +343,9 @@ Args:
     remove (bool, optional): Remove flake after materialization
     action (str): API action to use for materialization
 
-### <a id="api-flakes_flake_combine"></a> `flakes_flake_combine`
+### `flakes_flake_combine`
 
-Combine and show data from multiple flakes
+Combine data from multiple flakes
 
 `id` argument specifies all the flakes that must be combined. All of the flakes
 must exist, otherwise `NotFound` error raised. IDs at the start of the list have
@@ -322,7 +360,7 @@ Args:
     id (list): IDs of flakes.
     expand (dict, optional): Extend flake using data from the parent flakes
 
-### <a id="api-flakes_flake_merge"></a> `flakes_flake_merge`
+### `flakes_flake_merge`
 
 Combine multiple flakes and save the result.
 
@@ -333,7 +371,7 @@ Args:
     remove (bool, optional): Remove flakes after the operation.
     destination (str, optional): Save data into the specified flake instead of a new one
 
-### <a id="api-flakes_data_patch"></a> `flakes_data_patch`
+### `flakes_data_patch`
 
 Partially overrides data leaving other fields intact.
 
@@ -343,7 +381,7 @@ Args:
     data (dict): patch for data
 
 
-### <a id="api-flakes_extras_patch"></a> `flakes_extras_patch`
+### `flakes_extras_patch`
 
 Partially overrides extras leaving other fields intact.
 
@@ -351,6 +389,11 @@ Args:
 
     id (str): ID of flake
     extras (dict): patch for extras
+
+
+## Examples
+
+...
 
 ## Developer installation
 
