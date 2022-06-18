@@ -22,7 +22,7 @@ with your suggestion.
 * [API](#api)
   * [`flakes_flake_create`](#flakes_flake_create)
   * [`flakes_flake_show`](#flakes_flake_show)
-  * [`flakes_flake_lis`](#flakes_flake_lis)
+  * [`flakes_flake_list`](#flakes_flake_list)
   * [`flakes_flake_update`](#flakes_flake_update)
   * [`flakes_flake_override`](#flakes_flake_override)
   * [`flakes_flake_delete`](#flakes_flake_delete)
