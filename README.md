@@ -15,6 +15,8 @@ with your suggestion.
 
 ## Structure
 
+* [Examples](#examples)
+* [Definition](#definition)
 * [Requirements](#definition)
 * [Installation](#installation)
 * [Configuration](#configuration)
@@ -35,7 +37,26 @@ with your suggestion.
   * [`flakes_flake_merge`](#flakes_flake_merge)
   * [`flakes_data_patch`](#flakes_data_patch)
   * [`flakes_extras_patch`](#flakes_extras_patch)
-* [Examples](#examples)
+
+## Examples
+
+TODO list operations via flakes.
+
+First, let's create two task.
+
+```bash
+
+ckanapi action flakes_create_flake \
+    data='{"task": "add examples", "done": false}' \
+    extras='{"topic": "todo"}'
+
+
+ckanapi action flakes_create_flake \
+    name=todo/rest
+    data='{"task": "rest a bit", "done": false}' \
+    extras='{"topic": "todo"}'
+
+```
 
 ### Definition
 
@@ -389,11 +410,6 @@ Args:
 
     id (str): ID of flake
     extras (dict): patch for extras
-
-
-## Examples
-
-...
 
 ## Developer installation
 
