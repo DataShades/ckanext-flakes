@@ -93,34 +93,40 @@ def flake_show(context, data_dict):
 def flake_list(context, data_dict):
     """Display all flakes of the user.
 
-    If both `extra_path` in form of `["top_level_key", "nested_key", ...]` and
-    string `extra_value` are provided, show only flakes that satisfy given
-    search criteria. Example:
+    If `extras` dictionary passed, show only flakes that contains given extras. Example:
 
         first_flake = Flake(extras={"xxx": {"yyy": "hello"}})
         second_flake = Flake(extras={"xxx": {"yyy": "world"}})
 
-        flake_list(context, {"extra_path": ["xxx", "yyy"], "extra_value": "hello"})
+        flake_list(context, {"extras": {"xxx": {"yyy": "hello"}})
         >>> first_flake
 
     Args:
         expand (bool, optional): Extend flake using data from the parent flakes
-        extra_path (list, optional): Nested path existing in extras
-        extra_value (str, optional): Value stored under the specified path
-
+        extras (dict, optional): Show only flakes whose extras contains passed dict
     """
 
     tk.check_access("flakes_flake_list", context, data_dict)
 
-    user = context["model"].User.get(context["user"])
     context["expand"] = data_dict["expand"]
 
-    if "extra_path" in data_dict and "extra_value" in data_dict:
-        flakes = Flake.by_extra(
-            data_dict["extra_path"], data_dict["extra_value"], user.id
-        )
+    if "user" in data_dict:
+        if data_dict["user"] is None:
+            user = None
+        else:
+            user = context["model"].User.get(data_dict["user"])
+            if not user:
+                raise tk.ObjectNotFound()
     else:
+        user = context["model"].User.get(context["user"])
+
+
+    if data_dict["extras"]:
+        flakes = Flake.by_extra(data_dict["extras"], user.id if user else None)
+    elif user:
         flakes = user.flakes
+    else:
+        flakes = []
 
     return [flake.dictize(context) for flake in flakes]
 

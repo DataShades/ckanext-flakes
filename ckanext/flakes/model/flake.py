@@ -4,6 +4,8 @@ from collections import ChainMap
 from datetime import datetime
 from typing import Any, Iterable, Optional
 
+from flatten_dict import flatten
+
 import ckan.model as model
 from ckan.lib.dictization import table_dictize
 from ckan.model.types import make_uuid
@@ -79,23 +81,32 @@ class Flake(Base):
         return model.Session.query(cls).filter_by(author_id=author_id)
 
     @classmethod
-    def by_name(cls, name: str, author_id: str) -> Optional[Self]:
+    def by_name(cls, name: str, author_id: Optional[str]) -> Optional[Self]:
         """Get user's flake using unique name of flake."""
-        return (
-            model.Session.query(cls)
-            .filter_by(name=name, author_id=author_id)
-            .one_or_none()
-        )
+        q = model.Session.query(cls)
+
+        if author_id:
+            q = q.filter_by(name=name, author_id=author_id)
+
+        return q.one_or_none()
+
 
     @classmethod
     def by_extra(
-        cls, path: Iterable[str], value: str, author_id: str
+            cls, extras: dict[str, Any], author_id: Optional[str]
     ) -> Iterable[Self]:
         """Get user's flakes using extra attribute."""
-        key: Any = cls.extras
-        for segment in path:
-            key = key[segment]
+        flattened = flatten(extras)
 
-        return model.Session.query(cls).filter(
-            cls.author_id == author_id, key.astext == value
-        )
+        q = model.Session.query(cls)
+
+        for k, v in flattened.items():
+            key: Any = cls.extras
+            for segment in k:
+                key = key[segment]
+            q = q.filter(key.astext == v)
+
+        if author_id:
+            q = q.filter(cls.author_id == author_id)
+
+        return q

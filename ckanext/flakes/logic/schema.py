@@ -65,12 +65,12 @@ def flake_show(not_missing, boolean_validator, unicode_safe):
 
 @validator_args
 def flake_list(
-    boolean_validator, ignore_missing, unicode_safe, json_list_or_string
+        boolean_validator, convert_to_json_if_string, dict_only, default, empty_if_not_sysadmin, ignore_missing
 ):
     return {
+        "user": [empty_if_not_sysadmin, ignore_missing],
         "expand": [boolean_validator],
-        "extra_path": [ignore_missing, json_list_or_string],
-        "extra_value": [ignore_missing, unicode_safe],
+        "extras": [default("{}"), convert_to_json_if_string, dict_only]
     }
 
 

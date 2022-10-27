@@ -264,22 +264,18 @@ Args:
 
 Display all flakes of the user.
 
-If both `extra_path` in form of `["top_level_key", "nested_key", ...]` and
-string `extra_value` are provided, show only flakes that satisfy given search
-criteria. Example:
+If `extras` dictionary passed, show only flakes that contains given extras. Example:
 
     first_flake = Flake(extras={"xxx": {"yyy": "hello"}})
     second_flake = Flake(extras={"xxx": {"yyy": "world"}})
 
-    flake_list(context, {"extra_path": ["xxx", "yyy"], "extra_value": "hello"})
+    flake_list(context, {"extras": {"xxx": {"yyy": "hello"}})
     >>> first_flake
 
 Args:
 
     expand (bool, optional): Extend flake using data from the parent flakes
-    extra_path (list, optional): Nested path existing in extras
-    extra_value (str, optional): Value stored under the specified path
-
+    extras (dict, optional): Show only flakes whose extras contains passed dict
 
 
 ### `flakes_flake_update`

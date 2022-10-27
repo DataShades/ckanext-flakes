@@ -137,14 +137,14 @@ class TestFlake:
         model.Session.add_all([f1, f2, f3])
         model.Session.commit()
 
-        assert list(Flake.by_extra(["tag"], "hello", f2.author_id)) == [f2]
-        assert list(Flake.by_extra(["tag"], "hello", f1.author_id)) == [f1]
+        assert list(Flake.by_extra({"tag": "hello"}, f2.author_id)) == [f2]
+        assert list(Flake.by_extra({"tag": "hello"}, f1.author_id)) == [f1]
 
         assert list(
-            Flake.by_extra(["tag", "nested"], "hello", f1.author_id)
+            Flake.by_extra({"tag": {"nested": "hello"}}, f1.author_id)
         ) == [f3]
         assert (
-            list(Flake.by_extra(["tag", "nested"], "hello", f2.author_id))
+            list(Flake.by_extra({"tag": {"nested": "hello"}}, f2.author_id))
             == []
         )
 

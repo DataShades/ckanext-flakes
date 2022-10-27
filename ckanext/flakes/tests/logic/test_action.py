@@ -194,8 +194,7 @@ class TestFlakeList:
         result = call_action(
             "flakes_flake_list",
             {"user": user["id"]},
-            extra_value="hello",
-            extra_path=["xxx", "yyy"],
+            extras={"xxx": {"yyy": "hello"}},
         )
         assert {first["id"]} == {f["id"] for f in result}
 
