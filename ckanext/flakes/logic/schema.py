@@ -69,6 +69,7 @@ def flake_list(
 ):
     return {
         "user": [empty_if_not_sysadmin, ignore_missing],
+        "global": [empty_if_not_sysadmin, boolean_validator],
         "expand": [boolean_validator],
         "extras": [default("{}"), convert_to_json_if_string, dict_only]
     }
