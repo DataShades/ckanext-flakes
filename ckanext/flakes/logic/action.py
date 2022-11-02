@@ -52,7 +52,10 @@ def flake_create(context, data_dict):
                 {"parent_id": ["Must be owned by the same user"]}
             )
 
-    if "name" in data_dict and Flake.by_name(data_dict["name"], user.id):
+    if (
+        "name" in data_dict
+        and Flake.by_name(data_dict["name"], user.id).one_or_none()
+    ):
         raise tk.ValidationError({"name": ["Must be unique"]})
 
     flake = Flake(author_id=user.id, **data_dict)
@@ -219,7 +222,7 @@ def flake_lookup(context, data_dict):
 
     tk.check_access("flakes_flake_lookup", context, data_dict)
     user = context["model"].User.get(context["user"])
-    flake = Flake.by_name(data_dict["name"], user.id)
+    flake = Flake.by_name(data_dict["name"], user.id).one_or_none()
 
     if not flake:
         raise tk.ObjectNotFound()
@@ -438,7 +441,6 @@ def extras_patch(context, data_dict):
     flake["extras"].update(data_dict["extras"])
 
     return tk.get_action("flakes_flake_update")(context, flake)
-
 
 
 @action

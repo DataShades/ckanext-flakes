@@ -81,19 +81,18 @@ class Flake(Base):
         return model.Session.query(cls).filter_by(author_id=author_id)
 
     @classmethod
-    def by_name(cls, name: str, author_id: Optional[str]) -> Optional[Self]:
+    def by_name(cls, name: str, author_id: Optional[str]) -> Iterable[Self]:
         """Get user's flake using unique name of flake."""
         q = model.Session.query(cls)
 
         if author_id:
             q = q.filter_by(name=name, author_id=author_id)
 
-        return q.one_or_none()
-
+        return q
 
     @classmethod
     def by_extra(
-            cls, extras: dict[str, Any], author_id: Optional[str]
+        cls, extras: dict[str, Any], author_id: Optional[str]
     ) -> Iterable[Self]:
         """Get user's flakes using extra attribute."""
         flattened = flatten(extras)

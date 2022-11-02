@@ -65,13 +65,18 @@ def flake_show(not_missing, boolean_validator, unicode_safe):
 
 @validator_args
 def flake_list(
-        boolean_validator, convert_to_json_if_string, dict_only, default, empty_if_not_sysadmin, ignore_missing
+    boolean_validator,
+    convert_to_json_if_string,
+    dict_only,
+    default,
+    empty_if_not_sysadmin,
+    ignore_missing,
 ):
     return {
         "user": [empty_if_not_sysadmin, ignore_missing],
         "global": [empty_if_not_sysadmin, boolean_validator],
         "expand": [boolean_validator],
-        "extras": [default("{}"), convert_to_json_if_string, dict_only]
+        "extras": [default("{}"), convert_to_json_if_string, dict_only],
     }
 
 
@@ -153,6 +158,7 @@ def extras_patch(
         "id": [not_missing, unicode_safe],
         "extras": [not_missing, convert_to_json_if_string, dict_only],
     }
+
 
 @validator_args
 def data_patch(

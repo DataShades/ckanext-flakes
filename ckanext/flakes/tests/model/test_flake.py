@@ -119,11 +119,11 @@ class TestFlake:
         )
         model.Session.commit()
 
-        assert not Flake.by_name(f1.name, f2.author_id)
-        assert not Flake.by_name(f2.name, f1.author_id)
+        assert not Flake.by_name(f1.name, f2.author_id).one_or_none()
+        assert not Flake.by_name(f2.name, f1.author_id).one_or_none()
 
-        assert Flake.by_name(f1.name, f1.author_id) == f1
-        assert Flake.by_name(f2.name, f2.author_id) == f2
+        assert Flake.by_name(f1.name, f1.author_id).one() == f1
+        assert Flake.by_name(f2.name, f2.author_id).one() == f2
 
     def test_search_by_extra(self, user_factory):
         first = user_factory()

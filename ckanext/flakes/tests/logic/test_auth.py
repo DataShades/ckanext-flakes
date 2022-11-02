@@ -79,11 +79,17 @@ class TestDataPatch:
         flake = flake_factory(user=author)
 
         assert call_auth(
-            "flakes_data_patch", {"user": author["name"]}, id=flake["id"], data={}
+            "flakes_data_patch",
+            {"user": author["name"]},
+            id=flake["id"],
+            data={},
         )
         with pytest.raises(tk.NotAuthorized):
             call_auth(
-                "flakes_data_patch", {"user": user["name"]}, id=flake["id"], data={}
+                "flakes_data_patch",
+                {"user": user["name"]},
+                id=flake["id"],
+                data={},
             )
 
 
@@ -95,11 +101,17 @@ class TestExtrasPatch:
         flake = flake_factory(user=author)
 
         assert call_auth(
-            "flakes_extras_patch", {"user": author["name"]}, id=flake["id"], extras={}
+            "flakes_extras_patch",
+            {"user": author["name"]},
+            id=flake["id"],
+            extras={},
         )
         with pytest.raises(tk.NotAuthorized):
             call_auth(
-                "flakes_extras_patch", {"user": user["name"]}, id=flake["id"], extras={}
+                "flakes_extras_patch",
+                {"user": user["name"]},
+                id=flake["id"],
+                extras={},
             )
 
 
