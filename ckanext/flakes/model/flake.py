@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import ChainMap
 from datetime import datetime
-from typing import Any, Iterable, Optional
+from typing import Any, Iterable, Optional, TYPE_CHECKING
 
 from flatten_dict import flatten
 
@@ -21,6 +21,10 @@ from sqlalchemy.orm import backref, relationship
 from typing_extensions import Self
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Query
+
 
 
 class Flake(Base):
@@ -76,12 +80,12 @@ class Flake(Base):
         return result
 
     @classmethod
-    def by_author(cls, author_id: str) -> Iterable[Self]:
+    def by_author(cls, author_id: str) -> "Query[Flake]":
         """Get user's flakes."""
         return model.Session.query(cls).filter_by(author_id=author_id)
 
     @classmethod
-    def by_name(cls, name: str, author_id: Optional[str]) -> Iterable[Self]:
+    def by_name(cls, name: str, author_id: Optional[str]) -> "Query[Flake]":
         """Get user's flake using unique name of flake."""
         q = model.Session.query(cls)
 
@@ -93,7 +97,7 @@ class Flake(Base):
     @classmethod
     def by_extra(
         cls, extras: dict[str, Any], author_id: Optional[str]
-    ) -> Iterable[Self]:
+    ) -> "Query[Flake]":
         """Get user's flakes using extra attribute."""
         flattened = flatten(extras)
 
