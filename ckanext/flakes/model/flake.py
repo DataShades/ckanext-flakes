@@ -26,7 +26,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
 
 
-
 class Flake(Base):
     __tablename__ = "flakes_flake"
 
