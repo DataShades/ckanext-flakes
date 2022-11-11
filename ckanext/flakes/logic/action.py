@@ -113,16 +113,19 @@ def flake_list(context, data_dict):
 
     context["expand"] = data_dict["expand"]
 
-    if "user" in data_dict:
+    if data_dict.get("global"):
+        user_id = None
+
+    elif "user" in data_dict:
         user = context["model"].User.get(data_dict["user"])
         if not user:
             raise tk.ObjectNotFound()
+        user_id = user.id
+
     else:
         user = context["model"].User.get(context["user"])
+        user_id = user.id
 
-    user_id = user.id
-    if data_dict.get("global"):
-        user_id = None
 
     if data_dict["extras"]:
         flakes = Flake.by_extra(data_dict["extras"], user_id)
