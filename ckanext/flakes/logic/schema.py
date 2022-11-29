@@ -93,22 +93,24 @@ def flake_validate(boolean_validator, not_missing, unicode_safe):
     return {
         "id": [not_missing, unicode_safe],
         "expand": [boolean_validator],
-        "schema": [not_missing],
+        "schema": [not_missing, unicode_safe],
     }
 
 
 @validator_args
-def data_validate(convert_to_json_if_string, dict_only, not_missing):
+def data_validate(convert_to_json_if_string, dict_only, not_missing,
+                  unicode_safe):
     return {
         "data": [not_missing, convert_to_json_if_string, dict_only],
-        "schema": [not_missing],
+        "schema": [not_missing, unicode_safe],
     }
 
 
 @validator_args
-def data_example(not_missing, convert_to_json_if_string, dict_only, default):
+def data_example(not_missing, convert_to_json_if_string, dict_only, default,
+                 unicode_safe):
     return {
-        "factory": [not_missing],
+        "factory": [not_missing, unicode_safe],
         "data": [default("{}"), convert_to_json_if_string, dict_only],
     }
 
@@ -140,10 +142,10 @@ def flake_combine(
 
 
 @validator_args
-def flake_merge(boolean_validator, ignore_missing):
+def flake_merge(boolean_validator, ignore_missing, unicode_safe):
     schema = flake_combine()
     schema["remove"] = [boolean_validator]
-    schema["destination"] = [ignore_missing]
+    schema["destination"] = [ignore_missing, unicode_safe]
     return schema
 
 
