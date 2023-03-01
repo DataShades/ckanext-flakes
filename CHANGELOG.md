@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/DataShades/ckanext-flakes/compare/v0.2.1...v0.2.2) (2023-03-01)
+
+
+### Features
+
+* add types for API ([82e2cc5](https://github.com/DataShades/ckanext-flakes/commit/82e2cc5094a72f770de91537cfee768e9ec34366))
+* configurable star-icon for flakes_rating ([94241ae](https://github.com/DataShades/ckanext-flakes/commit/94241ae61256092d3cad61afe2791ddb5799d92e))
+
 ### [0.2.1](https://github.com/DataShades/ckanext-flakes/compare/v0.2.0...v0.2.1) (2022-11-11)
 
 
