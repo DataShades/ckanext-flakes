@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections import ChainMap
-from typing import Any
 
 import ckan.plugins.toolkit as tk
 from ckan.logic import validate
