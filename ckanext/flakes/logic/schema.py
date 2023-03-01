@@ -98,8 +98,9 @@ def flake_validate(boolean_validator, not_missing, unicode_safe):
 
 
 @validator_args
-def data_validate(convert_to_json_if_string, dict_only, not_missing,
-                  unicode_safe):
+def data_validate(
+    convert_to_json_if_string, dict_only, not_missing, unicode_safe
+):
     return {
         "data": [not_missing, convert_to_json_if_string, dict_only],
         "schema": [not_missing, unicode_safe],
@@ -107,8 +108,9 @@ def data_validate(convert_to_json_if_string, dict_only, not_missing,
 
 
 @validator_args
-def data_example(not_missing, convert_to_json_if_string, dict_only, default,
-                 unicode_safe):
+def data_example(
+    not_missing, convert_to_json_if_string, dict_only, default, unicode_safe
+):
     return {
         "factory": [not_missing, unicode_safe],
         "data": [default("{}"), convert_to_json_if_string, dict_only],

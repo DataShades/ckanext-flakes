@@ -10,9 +10,7 @@ E = TypeVar("E", bound=Mapping[str, Any])
 
 
 class Flake:
-
     class Result:
-
         class Show(TypedDict, Generic[D, E]):
             id: str
             name: Optional[str]
@@ -23,13 +21,11 @@ class Flake:
             extras: E
 
     class Payload:
-
         class Create(TypedDict, Generic[D, E]):
             name: NotRequired[str]
             data: D
             parent_id: NotRequired[str]
             extras: NotRequired[E]
-
 
         class Update(TypedDict, Generic[D, E]):
             id: str
@@ -37,17 +33,14 @@ class Flake:
             parent_id: NotRequired[str]
             extras: NotRequired[E]
 
-
         class Override(TypedDict, Generic[D, E]):
             name: str
             data: D
             parent_id: NotRequired[str]
             extras: NotRequired[E]
 
-
         class Delete(TypedDict):
             id: str
-
 
         class Show(TypedDict):
             id: str

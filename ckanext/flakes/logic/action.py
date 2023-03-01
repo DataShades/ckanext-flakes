@@ -125,7 +125,6 @@ def flake_list(context, data_dict):
         user = context["model"].User.get(context["user"])
         user_id = user.id
 
-
     if data_dict["extras"]:
         flakes = Flake.by_extra(data_dict["extras"], user_id)
     elif user_id:

@@ -7,8 +7,10 @@ from ckan.tests.helpers import call_action
 
 @pytest.mark.ckan_config(
     "ckan.plugins",
-    "flakes flakes_scheming scheming_datasets scheming_groups"
-    " scheming_organizations",
+    (
+        "flakes flakes_scheming scheming_datasets scheming_groups"
+        " scheming_organizations"
+    ),
 )
 @pytest.mark.usefixtures("with_plugins")
 class TestPlugin:
