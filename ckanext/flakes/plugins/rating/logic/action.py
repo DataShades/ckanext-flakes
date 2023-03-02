@@ -36,7 +36,7 @@ def average(context, data_dict):
             context, {"name": name}
         )
         own_rating = own_vote["data"]["rating"]
-    except tk.ObjectNotFound:
+    except (tk.ObjectNotFound, tk.NotAuthorized):
         own_rating = 0
 
     return {
