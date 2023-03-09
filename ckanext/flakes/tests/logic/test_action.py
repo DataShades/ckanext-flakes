@@ -18,6 +18,10 @@ class TestFlakeCreate:
         flake = call_action("flakes_flake_create", data={}, author_id=user["name"])
         assert flake["author_id"] == user["id"]
 
+    def test_controlled_author_unowned(self):
+        flake = call_action("flakes_flake_create", data={}, author_id=None)
+        assert flake["author_id"] == None
+
     def test_base(self, user):
         result = call_action(
             "flakes_flake_create", {"user": user["name"]}, data={}
@@ -270,6 +274,26 @@ class TestFlakeLookup:
                 {"user": user["name"]},
                 name=flake["name"],
             )
+
+    def test_setting_author_by_sysadmin(self, flake_factory):
+        flake = flake_factory(name="flake")
+
+        found = call_action(
+            "flakes_flake_lookup",
+            name=flake["name"],
+            author_id=flake["author_id"]
+        )
+        assert found["id"] == flake["id"]
+
+    def test_searching_unowned_flake(self, flake_factory):
+        flake = flake_factory(name="flake", author_id=None)
+
+        found = call_action(
+            "flakes_flake_lookup",
+            name=flake["name"],
+            author_id=None
+        )
+        assert found["id"] == flake["id"]
 
 
 @pytest.mark.ckan_config("ckan.plugins", "flakes flakes_test")

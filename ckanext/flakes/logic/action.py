@@ -30,15 +30,18 @@ def flake_create(context, data_dict):
     """
 
     tk.check_access("flakes_flake_create", context, data_dict)
-    if "author_id" in data_dict:
-        user = model.User.get(data_dict.pop("author_id"))
-    else:
-        user = model.User.get(context["user"])
 
-    if not user:
-        raise tk.ObjectNotFound("User not found")
+    author_id = data_dict.pop("author_id", tk.missing)
 
-    author_id = user.id
+    if author_id is not None:
+        if author_id is tk.missing:
+            author_id = context["user"]
+
+        author = model.User.get(author_id)
+        if not author:
+            raise tk.NotAuthorized()
+
+        author_id = author.id
 
     sess = context["session"]
 
@@ -226,14 +229,29 @@ def flake_lookup(context, data_dict):
 
     Args:
         name (str): Name of the flake
+        expand (bool, optional): Extend flake using data from the parent flakes
+        author_id (str, optional): author ID(can be set only by sysadmin)
+
     """
 
     tk.check_access("flakes_flake_lookup", context, data_dict)
-    user = context["model"].User.get(context["user"])
-    flake = Flake.by_name(data_dict["name"], user.id).one_or_none()
+
+    author_id = data_dict.get("author_id")
+
+    if author_id is not None:
+        if author_id is tk.missing:
+            author_id = context["user"]
+
+        user = context["model"].User.get(author_id)
+        if not user:
+            raise tk.ObjectNotFound("User not found")
+
+        author_id = user.id
+
+    flake = Flake.by_name(data_dict["name"], author_id).one_or_none()
 
     if not flake:
-        raise tk.ObjectNotFound()
+        raise tk.ObjectNotFound("Flake not found")
 
     return flake.dictize(context)
 

@@ -9,22 +9,22 @@ if TYPE_CHECKING:
 
 @validator_args
 def flake_create(
-    not_missing: Validator,
-    convert_to_json_if_string: Validator,
-    dict_only: Validator,
-    ignore: Validator,
-    ignore_missing: Validator,
-    unicode_safe: Validator,
-    flakes_flake_id_exists: Validator,
-    ignore_empty: Validator,
-        empty_if_not_sysadmin: Validator,
+    not_missing,
+    convert_to_json_if_string,
+    dict_only,
+    ignore,
+    ignore_missing,
+    unicode_safe,
+    flakes_flake_id_exists,
+    ignore_empty,
+        empty_if_not_sysadmin,
 ) -> Schema:
     return {
         "name": [ignore_empty, unicode_safe],
         "data": [not_missing, convert_to_json_if_string, dict_only],
         "parent_id": [ignore_missing, flakes_flake_id_exists],
         "extras": [ignore_missing, convert_to_json_if_string, dict_only],
-        "author_id": [empty_if_not_sysadmin, ignore_missing],
+        "author_id": [empty_if_not_sysadmin],
         "__extras": [ignore],
     }
 
@@ -88,11 +88,11 @@ def flake_list(
 
 
 @validator_args
-def flake_lookup(boolean_validator, not_empty, unicode_safe, ignore_missing, empty_if_not_sysadmin) -> Schema:
+def flake_lookup(boolean_validator, not_empty, unicode_safe, empty_if_not_sysadmin) -> Schema:
     return {
         "name": [not_empty, unicode_safe],
         "expand": [boolean_validator],
-        "author_id": [empty_if_not_sysadmin, ignore_missing],
+        "author_id": [empty_if_not_sysadmin],
     }
 
 

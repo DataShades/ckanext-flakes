@@ -317,6 +317,8 @@ Display flake using its name.
 Args:
 
     name (str): Name of the flake
+    expand (bool, optional): Extend flake using data from the parent flakes
+    author_id (str, optional): author ID(can be set only by sysadmin)
 
 ### `flakes_flake_validate`
 
