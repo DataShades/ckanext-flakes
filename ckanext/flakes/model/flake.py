@@ -2,13 +2,9 @@ from __future__ import annotations
 
 from collections import ChainMap
 from datetime import datetime
-from typing import Any, Iterable, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Iterable, Optional
 
 from flatten_dict import flatten
-
-import ckan.model as model
-from ckan.lib.dictization import table_dictize
-from ckan.model.types import make_uuid
 from sqlalchemy import (
     Column,
     DateTime,
@@ -19,6 +15,10 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship
 from typing_extensions import Self
+
+import ckan.model as model
+from ckan.lib.dictization import table_dictize
+from ckan.model.types import make_uuid
 
 from .base import Base
 

@@ -1,6 +1,7 @@
-import ckan.model as model
 import pytest
 from sqlalchemy.exc import IntegrityError
+
+import ckan.model as model
 
 from ckanext.flakes.model.flake import Flake
 

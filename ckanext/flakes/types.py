@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 from collections.abc import Mapping
 from datetime import datetime
+from typing import Any, Generic, Optional, TypeVar
 
-from typing import Generic, Optional, TypeVar, Any
-from typing_extensions import TypedDict, NotRequired
+from typing_extensions import NotRequired, TypedDict
 
 D = TypeVar("D", bound=Mapping[str, Any])
 E = TypeVar("E", bound=Mapping[str, Any])

@@ -1,8 +1,9 @@
 from unittest.mock import ANY
 
+import pytest
+
 import ckan.model as model
 import ckan.plugins.toolkit as tk
-import pytest
 
 from ckanext.flakes.model import Flake
 

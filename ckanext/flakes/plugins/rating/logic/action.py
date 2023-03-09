@@ -8,6 +8,7 @@ from ckan.logic import validate
 from ckanext.toolbelt.decorators import Collector
 
 from ckanext.flakes.model import Flake
+
 from . import schema
 
 action, get_actions = Collector("flakes_rating").split()

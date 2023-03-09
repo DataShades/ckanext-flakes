@@ -1,5 +1,6 @@
-import ckan.lib.plugins as p
 import pytest
+
+import ckan.lib.plugins as p
 
 
 @pytest.mark.ckan_config("ckan.plugins", "flakes scheming_datasets")

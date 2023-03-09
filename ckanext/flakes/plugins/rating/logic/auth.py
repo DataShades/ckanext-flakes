@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ckan.plugins.toolkit as tk
 from ckan.authz import is_authorized
+
 from ckanext.toolbelt.decorators import Collector
 
 auth, get_auth_functions = Collector("flakes_rating").split()

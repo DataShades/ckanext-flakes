@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 
