@@ -8,6 +8,15 @@ from ckanext.flakes.model.flake import Flake
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestFlake:
+    def test_unowned_flake(self, user):
+        flake = Flake(data={})
+        model.Session.add(flake)
+        model.Session.commit()
+
+        record = model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
+        assert record
+        assert not record.author_id
+
     def test_autoremove_with_user(self, user):
         flake = Flake(data={}, author_id=user["id"])
         model.Session.add(flake)

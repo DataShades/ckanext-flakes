@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import ChainMap
 
 import ckan.plugins.toolkit as tk
+from ckan import model
 from ckan.logic import validate
 from ckan.plugins import get_plugin
 
@@ -23,18 +24,23 @@ def flake_create(context, data_dict):
         name (str, optional): name of the flake
         data (dict): flake's data
         parent_id (str, optional): ID of flake to extend
+        author_id (str, optional): author ID(can be set only by sysadmin)
         extras (dict): flake's extra details
 
     """
 
     tk.check_access("flakes_flake_create", context, data_dict)
+    if "author_id" in data_dict:
+        user = model.User.get(data_dict.pop("author_id"))
+    else:
+        user = model.User.get(context["user"])
+
+    if not user:
+        raise tk.ObjectNotFound("User not found")
+
+    author_id = user.id
 
     sess = context["session"]
-    model = context["model"]
-
-    user = model.User.get(context["user"])
-    if not user:
-        raise tk.NotAuthorized()
 
     if "parent_id" in data_dict:
         parent = (
@@ -46,18 +52,18 @@ def flake_create(context, data_dict):
         if not parent:
             raise tk.ObjectNotFound()
 
-        if parent.author_id != user.id:
+        if parent.author_id != author_id:
             raise tk.ValidationError(
                 {"parent_id": ["Must be owned by the same user"]}
             )
 
     if (
         "name" in data_dict
-        and Flake.by_name(data_dict["name"], user.id).one_or_none()
+        and Flake.by_name(data_dict["name"], author_id).one_or_none()
     ):
         raise tk.ValidationError({"name": ["Must be unique"]})
 
-    flake = Flake(author_id=user.id, **data_dict)
+    flake = Flake(author_id=author_id, **data_dict)
     sess.add(flake)
     sess.commit()
 
@@ -171,6 +177,7 @@ def flake_override(context, data_dict):
         name (str): Name flake to override
         data (dict): flakes data
         parent_id (str, optional): ID of flake to extend
+        author_id (str, optional): author ID(can be set only by sysadmin if flake does not exist)
         extras (dict): flake's extra details
     """
 

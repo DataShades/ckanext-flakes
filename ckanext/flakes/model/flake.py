@@ -47,7 +47,7 @@ class Flake(Base):
 
     author = relationship(
         model.User,
-        backref=backref("flakes", cascade="all, delete-orphan"),
+        backref=backref("flakes", cascade="all, delete"),
     )
     parent = relationship(
         "Flake",

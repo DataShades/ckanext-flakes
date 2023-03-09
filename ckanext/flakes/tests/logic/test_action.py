@@ -9,9 +9,14 @@ from ckanext.flakes.model import Flake
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestFlakeCreate:
-    def test_user_required(self, user):
+
+    def test_user_required(self):
         with pytest.raises(tk.NotAuthorized):
             call_action("flakes_flake_create", data={})
+
+    def test_controlled_author(self, user):
+        flake = call_action("flakes_flake_create", data={}, author_id=user["name"])
+        assert flake["author_id"] == user["id"]
 
     def test_base(self, user):
         result = call_action(

@@ -248,6 +248,7 @@ Args:
     name (str, optional): name of the flake
     data (dict): flake's data
     parent_id (str, optional): ID of flake to extend
+    author_id (str, optional): author ID(can be set only by sysadmin)
     extras (dict): flake's extra details
 
 ### `flakes_flake_show`
@@ -298,6 +299,7 @@ Args:
     name (str): Name flake to override
     data (dict): template itself
     parent_id (str, optional): ID of flake to extend
+    author_id (str, optional): author ID(can be set only by sysadmin if flake does not exist)
     extras (dict): flake's extra details
 
 ### `flakes_flake_delete`

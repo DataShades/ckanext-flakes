@@ -1,22 +1,30 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from ckan.logic.schema import validator_args
+
+if TYPE_CHECKING:
+    from ckan.types import Validator, Schema
 
 
 @validator_args
 def flake_create(
-    not_missing,
-    convert_to_json_if_string,
-    dict_only,
-    ignore,
-    ignore_missing,
-    unicode_safe,
-    flakes_flake_id_exists,
-    ignore_empty,
-):
+    not_missing: Validator,
+    convert_to_json_if_string: Validator,
+    dict_only: Validator,
+    ignore: Validator,
+    ignore_missing: Validator,
+    unicode_safe: Validator,
+    flakes_flake_id_exists: Validator,
+    ignore_empty: Validator,
+        empty_if_not_sysadmin: Validator,
+) -> Schema:
     return {
         "name": [ignore_empty, unicode_safe],
         "data": [not_missing, convert_to_json_if_string, dict_only],
         "parent_id": [ignore_missing, flakes_flake_id_exists],
         "extras": [ignore_missing, convert_to_json_if_string, dict_only],
+        "author_id": [empty_if_not_sysadmin, ignore_missing],
         "__extras": [ignore],
     }
 
@@ -30,7 +38,7 @@ def flake_update(
     ignore_missing,
     unicode_safe,
     flakes_flake_id_exists,
-):
+) -> Schema:
     return {
         "id": [not_missing, unicode_safe],
         "data": [not_missing, convert_to_json_if_string, dict_only],
@@ -42,21 +50,20 @@ def flake_update(
 
 @validator_args
 def flake_override(not_empty, unicode_safe):
-    schema = flake_update()
-    schema.pop("id")
+    schema = flake_create()
     schema["name"] = [not_empty, unicode_safe]
     return schema
 
 
 @validator_args
-def flake_delete(not_missing, unicode_safe):
+def flake_delete(not_missing: Validator, unicode_safe: Validator) -> Schema:
     return {
         "id": [not_missing, unicode_safe],
     }
 
 
 @validator_args
-def flake_show(not_missing, boolean_validator, unicode_safe):
+def flake_show(not_missing, boolean_validator, unicode_safe) -> Schema:
     return {
         "id": [not_missing, unicode_safe],
         "expand": [boolean_validator],
@@ -71,7 +78,7 @@ def flake_list(
     default,
     empty_if_not_sysadmin,
     ignore_missing,
-):
+) -> Schema:
     return {
         "user": [empty_if_not_sysadmin, ignore_missing],
         "global": [empty_if_not_sysadmin, boolean_validator],
@@ -81,15 +88,16 @@ def flake_list(
 
 
 @validator_args
-def flake_lookup(boolean_validator, not_empty, unicode_safe):
+def flake_lookup(boolean_validator, not_empty, unicode_safe, ignore_missing, empty_if_not_sysadmin) -> Schema:
     return {
         "name": [not_empty, unicode_safe],
         "expand": [boolean_validator],
+        "author_id": [empty_if_not_sysadmin, ignore_missing],
     }
 
 
 @validator_args
-def flake_validate(boolean_validator, not_missing, unicode_safe):
+def flake_validate(boolean_validator, not_missing, unicode_safe) -> Schema:
     return {
         "id": [not_missing, unicode_safe],
         "expand": [boolean_validator],
@@ -100,7 +108,7 @@ def flake_validate(boolean_validator, not_missing, unicode_safe):
 @validator_args
 def data_validate(
     convert_to_json_if_string, dict_only, not_missing, unicode_safe
-):
+) -> Schema:
     return {
         "data": [not_missing, convert_to_json_if_string, dict_only],
         "schema": [not_missing, unicode_safe],
@@ -110,7 +118,7 @@ def data_validate(
 @validator_args
 def data_example(
     not_missing, convert_to_json_if_string, dict_only, default, unicode_safe
-):
+) -> Schema:
     return {
         "factory": [not_missing, unicode_safe],
         "data": [default("{}"), convert_to_json_if_string, dict_only],
@@ -120,7 +128,7 @@ def data_example(
 @validator_args
 def flake_materialize(
     boolean_validator, not_missing, flakes_into_api_action, unicode_safe
-):
+) -> Schema:
     return {
         "id": [not_missing, unicode_safe],
         "expand": [boolean_validator],
@@ -136,7 +144,7 @@ def flake_combine(
     json_list_or_string,
     convert_to_json_if_string,
     dict_only,
-):
+) -> Schema:
     return {
         "id": [not_missing, json_list_or_string],
         "expand": [default("{}"), convert_to_json_if_string, dict_only],
@@ -157,7 +165,7 @@ def extras_patch(
     convert_to_json_if_string,
     dict_only,
     unicode_safe,
-):
+) -> Schema:
     return {
         "id": [not_missing, unicode_safe],
         "extras": [not_missing, convert_to_json_if_string, dict_only],
@@ -170,7 +178,7 @@ def data_patch(
     convert_to_json_if_string,
     dict_only,
     unicode_safe,
-):
+) -> Schema:
     return {
         "id": [not_missing, unicode_safe],
         "data": [not_missing, convert_to_json_if_string, dict_only],
