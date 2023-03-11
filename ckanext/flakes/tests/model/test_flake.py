@@ -13,7 +13,9 @@ class TestFlake:
         model.Session.add(flake)
         model.Session.commit()
 
-        record = model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
+        record = (
+            model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
+        )
         assert record
         assert not record.author_id
 

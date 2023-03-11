@@ -5,28 +5,19 @@ Revises: b8a5f5419306
 Create Date: 2023-03-09 08:49:20.549623
 
 """
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = 'a7384c7e0e27'
-down_revision = 'b8a5f5419306'
+revision = "a7384c7e0e27"
+down_revision = "b8a5f5419306"
 branch_labels = None
 depends_on = None
 
 
 def upgrade():
-    op.alter_column(
-        "flakes_flake",
-        "author_id",
-        nullable=True
-    )
+    op.alter_column("flakes_flake", "author_id", nullable=True)
 
 
 def downgrade():
-    op.alter_column(
-        "flakes_flake",
-        "author_id",
-        nullable=False
-    )
+    op.alter_column("flakes_flake", "author_id", nullable=False)

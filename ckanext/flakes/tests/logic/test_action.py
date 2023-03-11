@@ -9,13 +9,14 @@ from ckanext.flakes.model import Flake
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestFlakeCreate:
-
     def test_user_required(self):
         with pytest.raises(tk.NotAuthorized):
             call_action("flakes_flake_create", data={})
 
     def test_controlled_author(self, user):
-        flake = call_action("flakes_flake_create", data={}, author_id=user["name"])
+        flake = call_action(
+            "flakes_flake_create", data={}, author_id=user["name"]
+        )
         assert flake["author_id"] == user["id"]
 
     def test_controlled_author_unowned(self):
@@ -281,7 +282,7 @@ class TestFlakeLookup:
         found = call_action(
             "flakes_flake_lookup",
             name=flake["name"],
-            author_id=flake["author_id"]
+            author_id=flake["author_id"],
         )
         assert found["id"] == flake["id"]
 
@@ -289,9 +290,7 @@ class TestFlakeLookup:
         flake = flake_factory(name="flake", author_id=None)
 
         found = call_action(
-            "flakes_flake_lookup",
-            name=flake["name"],
-            author_id=None
+            "flakes_flake_lookup", name=flake["name"], author_id=None
         )
         assert found["id"] == flake["id"]
 

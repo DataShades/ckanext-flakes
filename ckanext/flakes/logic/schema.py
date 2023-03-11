@@ -1,10 +1,11 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from ckan.logic.schema import validator_args
 
 if TYPE_CHECKING:
-    from ckan.types import Validator, Schema
+    from ckan.types import Schema, Validator
 
 
 @validator_args
@@ -17,7 +18,7 @@ def flake_create(
     unicode_safe,
     flakes_flake_id_exists,
     ignore_empty,
-        empty_if_not_sysadmin,
+    empty_if_not_sysadmin,
 ) -> Schema:
     return {
         "name": [ignore_empty, unicode_safe],
@@ -87,7 +88,9 @@ def flake_list(
 
 
 @validator_args
-def flake_lookup(boolean_validator, not_empty, unicode_safe, empty_if_not_sysadmin) -> Schema:
+def flake_lookup(
+    boolean_validator, not_empty, unicode_safe, empty_if_not_sysadmin
+) -> Schema:
     return {
         "name": [not_empty, unicode_safe],
         "expand": [boolean_validator],

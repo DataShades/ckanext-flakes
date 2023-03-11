@@ -121,7 +121,6 @@ def flake_list(context, data_dict):
 
     context["expand"] = data_dict["expand"]
 
-
     author_id = data_dict.get("author_id")
 
     if author_id is not None:
@@ -133,7 +132,6 @@ def flake_list(context, data_dict):
             raise tk.ObjectNotFound("User not found")
 
         author_id = user.id
-
 
     if data_dict["extras"]:
         flakes = Flake.by_extra(data_dict["extras"], author_id)
