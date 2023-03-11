@@ -121,25 +121,24 @@ def flake_list(context, data_dict):
 
     context["expand"] = data_dict["expand"]
 
-    if data_dict.get("global"):
-        user_id = None
 
-    elif "user" in data_dict:
-        user = context["model"].User.get(data_dict["user"])
+    author_id = data_dict.get("author_id")
+
+    if author_id is not None:
+        if author_id is tk.missing:
+            author_id = context["user"]
+
+        user = context["model"].User.get(author_id)
         if not user:
-            raise tk.ObjectNotFound()
-        user_id = user.id
+            raise tk.ObjectNotFound("User not found")
 
-    else:
-        user = context["model"].User.get(context["user"])
-        user_id = user.id
+        author_id = user.id
+
 
     if data_dict["extras"]:
-        flakes = Flake.by_extra(data_dict["extras"], user_id)
-    elif user_id:
-        flakes = user.flakes
+        flakes = Flake.by_extra(data_dict["extras"], author_id)
     else:
-        flakes = context["session"].query(Flake)
+        flakes = Flake.by_author(author_id)
 
     return [flake.dictize(context) for flake in flakes]
 

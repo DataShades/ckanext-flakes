@@ -80,8 +80,7 @@ def flake_list(
     ignore_missing,
 ) -> Schema:
     return {
-        "user": [empty_if_not_sysadmin, ignore_missing],
-        "global": [empty_if_not_sysadmin, boolean_validator],
+        "author_id": [empty_if_not_sysadmin],
         "expand": [boolean_validator],
         "extras": [default("{}"), convert_to_json_if_string, dict_only],
     }

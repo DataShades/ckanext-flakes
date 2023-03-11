@@ -79,12 +79,12 @@ class Flake(Base):
         return result
 
     @classmethod
-    def by_author(cls, author_id: str) -> "Query[Flake]":
+    def by_author(cls, author_id: str) -> "Query[Self]":
         """Get user's flakes."""
         return model.Session.query(cls).filter_by(author_id=author_id)
 
     @classmethod
-    def by_name(cls, name: str, author_id: Optional[str]) -> "Query[Flake]":
+    def by_name(cls, name: str, author_id: Optional[str]) -> "Query[Self]":
         """Get user's flake using unique name of flake."""
         q = model.Session.query(cls)
 
@@ -96,7 +96,7 @@ class Flake(Base):
     @classmethod
     def by_extra(
         cls, extras: dict[str, Any], author_id: Optional[str]
-    ) -> "Query[Flake]":
+    ) -> "Query[Self]":
         """Get user's flakes using extra attribute."""
         flattened = flatten(extras)
 

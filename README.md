@@ -16,7 +16,6 @@ with your suggestion.
 ## Structure
 
 * [Examples](#examples)
-* [Definition](#definition)
 * [Requirements](#definition)
 * [Installation](#installation)
 * [Configuration](#configuration)
@@ -40,113 +39,6 @@ with your suggestion.
 
 ## Examples
 
-TODO list operations via flakes.
-
-First, let's create two task.
-
-```bash
-
-ckanapi action flakes_create_flake \
-    data='{"task": "add examples", "done": false}' \
-    extras='{"topic": "todo"}'
-
-
-ckanapi action flakes_create_flake \
-    name=todo/rest
-    data='{"task": "rest a bit", "done": false}' \
-    extras='{"topic": "todo"}'
-
-```
-
-### Definition
-
-Whenever you see the word **flake** below, it means a record, that contains
-an arbitrary dictionary. A couple of facts:
-
-* *flakes* can be obtained only by their author. It means, you can store
-  private data there.
-* Absolutely every *flake* contains data. At least an empty dictionary. But there
-  is no flake that has no data at all.
-* *Flake* can hold extra details, that are not a part of the data. Its purpose,
-  description, tags, anything(just like `plugin_extras` inside the User
-  model). Extra details are just a separate dictionary that can hold any
-  information that is important for the *flake* but cannot be placed inside the
-  *flake*'s primary data.
-* *Flakes* belong to the user. There is no unowned *flake*. Whenever owner is
-  removed, all his flakes removed as well.
-* *Flake* can have a name. Not necessary, but if you want to create a very
-  special *flake*, you can give it a name. You cannot have two *flakes* with
-  the same name(because every named flake is **really special** for you). But
-  other users can use the same names for their flakes as you do. In other
-  words, *flake*'s **name** is unique per user.
-* *Flake* can have a **parent**. If the parent is removed, all its descendants
-  removed as well. **Parent** extends *flake*'s data, providing default
-  values. The behavior of the *flake* with a **parent** is very similar to the
-  built-in `collections.ChainMap`. *Flake* can have only one parent, so there
-  are no things like python's method resolution order.
-* [*Flake* can be validated](#flakes_flake_validate).
-* *Flakes* can be combined. Check
-  [`flakes_flake_combine`](#flakes_flake_combine) and
-  [`flakes_flake_merge`](#flakes_flake_merge) actions below.
-
-### Where you can use it?
-
-* You want to create a **TODO list inside your application**. You actually can
-  * define custom dataset type for this purpose
-  * Create migration, model, set of actions
-
-  Easy, but I've done it too many times and at some point, I even created
-  macros for such tasks. Do I have to do it again? Hmmm.. why not use *flakes*?
-  They can hold arbitrary data, such as task, deadline, and state. By default,
-  *flakes* are visible only to the owner(and sysadmin, of course), so they
-  won't leak to other users. And you can use *flake*'s extra in order to set,
-  for example, the task's subject and use it for filtering via
-  [`flakes_flake_list`](#flakes_flake_list). The only thing you need to do
-  is a UI for the TODO list. But you have to do it anyway because it must be
-  styled using your app's style guidelines and branding colors.
-
-* You need to create **resources before the dataset**. Don't know why, but you
-  have all the resource details(except for the uploaded file because *flakes*
-  are about information, not about files). CKAN will not be happy if you try
-  `resource_create` without the dataset's ID.
-
-  But how about creating a *flake*? Put all the details into it and forget
-  about the resource. Take a break or even vacation. Get back to work, and
-  create a dataset. Add dataset's ID to the existing flake via
-  [`flakes_flake_update`](#flakes_flake_update) or
-  [`flakes_flake_override`](#flakes_flake_override). And turn it into a
-  resource using [`flakes_flake_materialize`](#flakes_flake_materialize).
-
-* You are developing **multi-step dataset creation form**. Sounds cool. But you
-  have to store different pieces of dataset somewhere. Of course, if you don't
-  have an overprotective validation schema, you can just save all the parts
-  inside the draft dataset. But if you do have such schema.. well, you know
-  what I'll recommend, right? Just create a bunch of *flakes*, [combine them
-  into a dictionary](#flakes_flake_combine), and send this dictionary to
-  the `package_create`. Or [merge them into a new
-  flake](#flakes_flake_merge) and [materialize using API action on your
-  choice](#flakes_flake_materialize). Have you said
-  ["validation"](#flakes_data_validate)? Or you meant [another
-  "validation"](#flakes_flake_validate)?
-
-* How about a **user-request functionality**? User has a `state` so you can
-  create a *pending* user account, that requires approval. But when somebody
-  creates a user request, he can give you extra details, like the reason to join
-  the portal, the organization in which the new user wants to be a member, etc. You
-  already know what to do.
-
-* Actually, **anything that requires some sort of approval** can use
-  *flakes*:
-
-  * Dataset suggestion? Yes, you don't need a draft dataset here.
-  * Dataset revision, that must be approved, before an actual dataset is
-    updated? Why not? If you prefer to clone the dataset, modify the clone, and
-    merge it back, it's ok. But if it's overkill for your case and you just
-    need small patches, *flake* may save you a day or two.
-  * Request to move a dataset from one organization to another or mark it as
-    obsolete/superseeded? I don't mind.
-
----
 
 ## Requirements
 
@@ -277,7 +169,7 @@ Args:
 
     expand (bool, optional): Extend flake using data from the parent flakes
     extras (dict, optional): Show only flakes whose extras contains passed dict
-
+    author_id (str, optional): author ID(can be set only by sysadmin)
 
 ### `flakes_flake_update`
 
