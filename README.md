@@ -39,6 +39,136 @@ with your suggestion.
 
 ## Examples
 
+### Create a collection of records
+
+Scenario: user needs a todo list
+
+Flakes created by any user are visible only to this user so flakes can be used
+as a storage for private data.
+
+Flakes can have `extras`, that plays a role of tags. `extras` represented by a
+dictionary and whenever user lists his flakes, he has an option to see only
+flakes that contains particular data inside extras.
+
+```python
+flake_create = tk.get_action("flakes_flake_create")
+flake_list = tk.get_action("flakes_flake_create")
+
+# create an urgent taks
+flake_create(
+    {"user": "john"},
+    {"data": {"task": "feed the cat"}, "extras": {"when": "today", "type": "task"}}
+)
+
+# create a couple of tasks that can wait
+flake_create(
+    {"user": "john"},
+    {"data": {"task": "buy food"}, "extras": {"when": "tomorrow", "type": "task"}}
+)
+flake_create(
+    {"user": "john"},
+    {"data": {"task": "update documentation"}, "extras": {"when": "tomorrow", "type": "task"}}
+)
+
+# list all the tasks
+flake_list(
+    {"user": "john"},
+    {"extras": {"type": "task"}}
+)
+
+# list all the urgent tasks
+flake_list(
+    {"user": "john"},
+    {"extras": {"type": "task", "when": "today"}}
+)
+
+# list all the tasks for tomorrow
+flake_list(
+    {"user": "john"},
+    {"extras": {"type": "task", "when": "tomorrow"}}
+)
+```
+
+### Save the value of the option individually for every user
+
+Scenario: each user can set a theme of application and this theme will be applied only for the current user
+
+Flake are created for the user from the `context`. Flakes of the user A are
+visible only to the user A, flakes of the user B exist in the different
+namespace and are visible only to the user B.
+
+Each flake **can** have a name. Name must be unique among the flakes of the
+user. But different users can use the same names for their flakes, because
+every user has its own namespace for flakes.
+
+Flakes can be created either via `flakes_flake_create` action(accepts
+**optional** name and raises exception if name is not unique) or
+`flakes_flake_override`(requires a name and creates a new flake if name is not
+taken or updates existing flake if name already used by some flake)
+
+In order to get the flake use `flakes_flake_show` with the `id` of the flake or
+`flakes_flake_lookup` with the `name`.
+
+```python
+# set a theme for John
+tk.get_action("flakes_flake_override")(
+    {"user": "john"},
+    {"name": "application:theme", "data": {"theme": "dark"}}
+)
+
+# set a theme for Mary
+tk.get_action("flakes_flake_override")(
+    {"user": "mary"},
+    {"name": "application:theme", "data": {"theme": "light"}}
+)
+
+
+# get the value from the flake
+john_theme = tk.get_action("flakes_flake_lookup")(
+    {"user": "john"},
+    {"name": "application:theme"}
+)["data"]["theme"]
+
+mary_theme = tk.get_action("flakes_flake_lookup")(
+    {"user": "mary"},
+    {"name": "application:theme"}
+)["data"]["theme"]
+
+assert john_theme == "dark"
+assert mary_theme == "light"
+```
+
+### Create and obtain global variable
+
+Scenario: application requires global option, that can by changed in runtime
+
+By default flakes are created in the "namespace" of the current user. Only the
+author can see and modify his own flakes.
+
+Global values should not be owned by someone, so here we need "unowned" flake -
+the flake that is not connected to the particular user. Only sysadmin can
+create such flakes, so we are going to use `ignore_auth=True` attribute of the
+context.
+
+We'll use `flakes_flake_override` action, that accepts a `name` of the flake
+and either updates existing flakes with this name or creates a new one if this
+name is free. In this way we'll avoid duplicates of the global flake.
+
+
+```python
+# create a flake
+tk.get_action("flakes_flake_override")(
+    {"ignore_auth": True}, # only syadmin allowed to create unowned flakes with empty author id
+    {"name": "global:config:value", "data": {"value": 1}, "author_id": None}
+)
+
+# get the value from the flake
+value = tk.get_action("flakes_flake_lookup")(
+    {"ignore_auth": True},
+    {"name": "global:config:value", "author_id": None}
+)["data"]["value"]
+```
+
 
 ## Requirements
 
@@ -59,27 +189,26 @@ Compatibility with core CKAN versions:
 To install ckanext-flakes:
 
 1. Install it via **pip**:
-
-        pip install ckanext-flakes
-
+   ```sh
+   pip install ckanext-flakes
+   ```
 1. Add `flakes` to the `ckan.plugins` setting in your CKAN config file.
 1. Run DB migrations:
-
-        ckan db upgrade -p flakes
+   ```sh
+   ckan db upgrade -p flakes
+   ```
 
 ## Configuration
 
-	# Allow logged-in user to create flakes.
-    # When disabled, only sysadmin can work with flakes.
-	# (optional, default: true).
-    ckanext.flakes.creation.allowed = no
+```ini
+# Any user can create a new flake.
+# (optional, default: true)
+ckanext.flakes.creation.allowed = false
 
-	# Allow validation. Depending on your validation schemas,
-    # it can potentially discover some sensitive information.
-	# For example, there is a validator, which verifies that user ID exists.
-    # That's why validation is disabled by default.
-	# (optional, default: false).
-    ckanext.flakes.validation.allowed = yes
+# Any user can validate flake or plain data.
+# (optional, default: false)
+ckanext.flakes.validation.allowed = true
+```
 
 ## Interfaces
 

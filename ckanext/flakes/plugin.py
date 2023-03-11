@@ -3,11 +3,19 @@ from __future__ import annotations
 from typing import Any, Optional
 
 import ckan.plugins as p
+import ckan.plugins.toolkit as tk
 
 from .interfaces import IFlakes
 from .logic import action, auth, validators
 
+try:
+    config_declarations = tk.blanket.config_declarations
+except AttributeError:
+    def config_declarations(cls):
+        return cls
 
+
+@config_declarations
 class FlakesPlugin(p.SingletonPlugin):
     p.implements(p.IConfigurable)
     p.implements(p.IActions)
