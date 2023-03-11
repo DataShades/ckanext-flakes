@@ -24,18 +24,14 @@ def average(context, data_dict):
         context["session"]
         .query(
             sa.func.count(Flake.id).label("count"),
-            sa.func.avg(Flake.data["rating"].astext.cast(sa.Float)).label(
-                "average"
-            ),
+            sa.func.avg(Flake.data["rating"].astext.cast(sa.Float)).label("average"),
         )
         .filter(Flake.name == name)
         .one()
     )
 
     try:
-        own_vote = tk.get_action("flakes_flake_lookup")(
-            context, {"name": name}
-        )
+        own_vote = tk.get_action("flakes_flake_lookup")(context, {"name": name})
         own_rating = own_vote["data"]["rating"]
     except (tk.ObjectNotFound, tk.NotAuthorized):
         own_rating = 0

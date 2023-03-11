@@ -67,9 +67,7 @@ class TestFlakeUpdate:
             "flakes_flake_update", {"user": author["name"]}, id=flake["id"]
         )
         with pytest.raises(tk.NotAuthorized):
-            call_auth(
-                "flakes_flake_update", {"user": user["name"]}, id=flake["id"]
-            )
+            call_auth("flakes_flake_update", {"user": user["name"]}, id=flake["id"])
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
@@ -127,9 +125,7 @@ class TestFlakeDelete:
             "flakes_flake_delete", {"user": author["name"]}, id=flake["id"]
         )
         with pytest.raises(tk.NotAuthorized):
-            call_auth(
-                "flakes_flake_delete", {"user": user["name"]}, id=flake["id"]
-            )
+            call_auth("flakes_flake_delete", {"user": user["name"]}, id=flake["id"])
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
@@ -139,13 +135,9 @@ class TestFlakeShow:
         author = user_factory()
         flake = flake_factory(user=author)
 
-        assert call_auth(
-            "flakes_flake_show", {"user": author["name"]}, id=flake["id"]
-        )
+        assert call_auth("flakes_flake_show", {"user": author["name"]}, id=flake["id"])
         with pytest.raises(tk.NotAuthorized):
-            call_auth(
-                "flakes_flake_show", {"user": user["name"]}, id=flake["id"]
-            )
+            call_auth("flakes_flake_show", {"user": user["name"]}, id=flake["id"])
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
@@ -163,14 +155,10 @@ class TestFlakeValidate:
             )
 
         with pytest.raises(tk.NotAuthorized):
-            call_auth(
-                "flakes_flake_validate", {"user": user["name"]}, id=flake["id"]
-            )
+            call_auth("flakes_flake_validate", {"user": user["name"]}, id=flake["id"])
 
     @pytest.mark.ckan_config(CONFIG_VALIDATION_ALLOWED, True)
-    def test_author_can_validate_when_allowed(
-        self, user_factory, flake_factory
-    ):
+    def test_author_can_validate_when_allowed(self, user_factory, flake_factory):
         user = user_factory()
         author = user_factory()
         flake = flake_factory(user=author)
@@ -180,9 +168,7 @@ class TestFlakeValidate:
         )
 
         with pytest.raises(tk.NotAuthorized):
-            call_auth(
-                "flakes_flake_validate", {"user": user["name"]}, id=flake["id"]
-            )
+            call_auth("flakes_flake_validate", {"user": user["name"]}, id=flake["id"])
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")

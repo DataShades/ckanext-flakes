@@ -20,9 +20,7 @@ DEFAULT_VALIDATION_ALLOWED = False
 
 @auth
 def flake_create(context, data_dict):
-    if not tk.asbool(
-        tk.config.get(CONFIG_CREATION_ALLOWED, DEFAULT_CREATION_ALLOWED)
-    ):
+    if not tk.asbool(tk.config.get(CONFIG_CREATION_ALLOWED, DEFAULT_CREATION_ALLOWED)):
         return {"success": False}
 
     author = context["model"].User.get(context["user"])
@@ -83,10 +81,7 @@ def flake_delete(context, data_dict):
 
 @auth
 def flake_validate(context, data_dict):
-    return {
-        "success": _valdiation_allowed()
-        and _owns_flake(context, data_dict["id"])
-    }
+    return {"success": _valdiation_allowed() and _owns_flake(context, data_dict["id"])}
 
 
 @auth
@@ -106,9 +101,7 @@ def flake_materialize(context, data_dict):
 
 @auth
 def flake_combine(context, data_dict):
-    return {
-        "success": all(_owns_flake(context, id_) for id_ in data_dict["id"])
-    }
+    return {"success": all(_owns_flake(context, id_) for id_ in data_dict["id"])}
 
 
 @auth

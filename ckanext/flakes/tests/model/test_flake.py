@@ -13,9 +13,7 @@ class TestFlake:
         model.Session.add(flake)
         model.Session.commit()
 
-        record = (
-            model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
-        )
+        record = model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
         assert record
         assert not record.author_id
 
@@ -30,9 +28,7 @@ class TestFlake:
         model.Session.delete(userobj)
         model.Session.commit()
 
-        assert (
-            not model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
-        )
+        assert not model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
 
     def test_user_not_removed_with_flake(self, user):
         flake = Flake(data={}, author_id=user["id"])
@@ -45,9 +41,7 @@ class TestFlake:
         model.Session.delete(flake)
         model.Session.commit()
 
-        assert (
-            not model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
-        )
+        assert not model.Session.query(Flake).filter_by(id=flake.id).one_or_none()
         assert model.User.get(user["id"])
 
     def test_relationship(self, user):
@@ -143,22 +137,15 @@ class TestFlake:
 
         f1 = Flake(data={}, extras={"tag": "hello"}, author_id=first["id"])
         f2 = Flake(data={}, extras={"tag": "hello"}, author_id=second["id"])
-        f3 = Flake(
-            data={}, extras={"tag": {"nested": "hello"}}, author_id=first["id"]
-        )
+        f3 = Flake(data={}, extras={"tag": {"nested": "hello"}}, author_id=first["id"])
         model.Session.add_all([f1, f2, f3])
         model.Session.commit()
 
         assert list(Flake.by_extra({"tag": "hello"}, f2.author_id)) == [f2]
         assert list(Flake.by_extra({"tag": "hello"}, f1.author_id)) == [f1]
 
-        assert list(
-            Flake.by_extra({"tag": {"nested": "hello"}}, f1.author_id)
-        ) == [f3]
-        assert (
-            list(Flake.by_extra({"tag": {"nested": "hello"}}, f2.author_id))
-            == []
-        )
+        assert list(Flake.by_extra({"tag": {"nested": "hello"}}, f1.author_id)) == [f3]
+        assert list(Flake.by_extra({"tag": {"nested": "hello"}}, f2.author_id)) == []
 
     def test_search_by_author(self, user_factory):
         first = user_factory()

@@ -14,19 +14,15 @@ class TestFlakeCreate:
             call_action("flakes_flake_create", data={})
 
     def test_controlled_author(self, user):
-        flake = call_action(
-            "flakes_flake_create", data={}, author_id=user["name"]
-        )
+        flake = call_action("flakes_flake_create", data={}, author_id=user["name"])
         assert flake["author_id"] == user["id"]
 
     def test_controlled_author_unowned(self):
         flake = call_action("flakes_flake_create", data={}, author_id=None)
-        assert flake["author_id"] == None
+        assert flake["author_id"] is None
 
     def test_base(self, user):
-        result = call_action(
-            "flakes_flake_create", {"user": user["name"]}, data={}
-        )
+        result = call_action("flakes_flake_create", {"user": user["name"]}, data={})
         assert model.Session.query(Flake).filter_by(id=result["id"]).one()
 
     def test_name_must_be_unique_for_user(self, user, user_factory):
@@ -65,9 +61,7 @@ class TestFlakeCreate:
             )
 
     def test_normal_parent(self, user):
-        parent = call_action(
-            "flakes_flake_create", {"user": user["name"]}, data={}
-        )
+        parent = call_action("flakes_flake_create", {"user": user["name"]}, data={})
 
         child = call_action(
             "flakes_flake_create",
@@ -79,9 +73,7 @@ class TestFlakeCreate:
 
     def test_parent_from_other_user(self, user, user_factory):
         another_user = user_factory()
-        parent = call_action(
-            "flakes_flake_create", {"user": user["name"]}, data={}
-        )
+        parent = call_action("flakes_flake_create", {"user": user["name"]}, data={})
         with pytest.raises(tk.ValidationError):
             call_action(
                 "flakes_flake_create",
@@ -140,11 +132,7 @@ class TestFlakeOverride:
 class TestFlakeDelete:
     def test_base(self, flake):
         call_action("flakes_flake_delete", id=flake["id"])
-        assert (
-            not model.Session.query(Flake)
-            .filter_by(id=flake["id"])
-            .one_or_none()
-        )
+        assert not model.Session.query(Flake).filter_by(id=flake["id"]).one_or_none()
 
     def test_missing(self):
         with pytest.raises(tk.ObjectNotFound):
@@ -231,9 +219,7 @@ class TestFlakeList:
         assert {"override": "first"} in datas
         assert {"override": "second"} in datas
 
-        result = call_action(
-            "flakes_flake_list", {"user": user["id"]}, expand=True
-        )
+        result = call_action("flakes_flake_list", {"user": user["id"]}, expand=True)
         datas = [f["data"] for f in result]
         assert {"hello": "world"} in datas
         assert {"override": "first"} in datas
@@ -248,23 +234,17 @@ class TestFlakeLookup:
         flake_factory(user=user)
 
         assert (
-            call_action(
-                "flakes_flake_lookup", {"user": user["name"]}, name="hello"
-            )
+            call_action("flakes_flake_lookup", {"user": user["name"]}, name="hello")
             == hello
         )
         assert (
-            call_action(
-                "flakes_flake_lookup", {"user": user["name"]}, name="world"
-            )
+            call_action("flakes_flake_lookup", {"user": user["name"]}, name="world")
             == world
         )
 
     def test_not_real(self, user):
         with pytest.raises(tk.ObjectNotFound):
-            call_action(
-                "flakes_flake_lookup", {"user": user["name"]}, name="not-real"
-            )
+            call_action("flakes_flake_lookup", {"user": user["name"]}, name="not-real")
 
     def test_different_user(self, flake_factory, user):
         flake = flake_factory(name="flake")
@@ -289,9 +269,7 @@ class TestFlakeLookup:
     def test_searching_unowned_flake(self, flake_factory):
         flake = flake_factory(name="flake", author_id=None)
 
-        found = call_action(
-            "flakes_flake_lookup", name=flake["name"], author_id=None
-        )
+        found = call_action("flakes_flake_lookup", name=flake["name"], author_id=None)
         assert found["id"] == flake["id"]
 
 
@@ -304,9 +282,7 @@ class TestFlakeValidate:
 
     def test_base(self, flake):
         schema = "empty"
-        result = call_action(
-            "flakes_flake_validate", id=flake["id"], schema=schema
-        )
+        result = call_action("flakes_flake_validate", id=flake["id"], schema=schema)
 
         assert result == call_action(
             "flakes_data_validate", data=flake["data"], schema=schema
@@ -330,9 +306,7 @@ class TestFlakeValidate:
             schema="empty",
             expand=True,
         )
-        assert result["data"] == {
-            "__extras": {**flake["data"], **{"hello": "world"}}
-        }
+        assert result["data"] == {"__extras": {**flake["data"], **{"hello": "world"}}}
 
 
 @pytest.mark.ckan_config("ckan.plugins", "flakes flakes_test")
@@ -351,9 +325,7 @@ class TestDataValidate:
 
     def test_missing_schema(self):
         with pytest.raises(tk.ValidationError):
-            call_action(
-                "flakes_data_validate", data={}, schema="not-a-real-schema"
-            )
+            call_action("flakes_data_validate", data={}, schema="not-a-real-schema")
 
 
 @pytest.mark.ckan_config("ckan.plugins", "flakes flakes_test")
@@ -362,16 +334,12 @@ class TestDataExample:
     def test_base(self):
         data = {"hello": "world"}
 
-        result = call_action(
-            "flakes_data_example", data=data, factory="identity"
-        )
+        result = call_action("flakes_data_example", data=data, factory="identity")
         assert result == {"data": data}
 
     def test_missing_schema(self):
         with pytest.raises(tk.ValidationError):
-            call_action(
-                "flakes_data_example", data={}, factory="not-a-real-factory"
-            )
+            call_action("flakes_data_example", data={}, factory="not-a-real-factory")
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")
@@ -452,14 +420,10 @@ class TestFlakeCombine:
         first = flake_factory()
         second = flake_factory()
 
-        result = call_action(
-            "flakes_flake_combine", id=[first["id"], second["id"]]
-        )
+        result = call_action("flakes_flake_combine", id=[first["id"], second["id"]])
         assert result == {**second["data"], **first["data"]}
 
-        result = call_action(
-            "flakes_flake_combine", id=[second["id"], first["id"]]
-        )
+        result = call_action("flakes_flake_combine", id=[second["id"], first["id"]])
         assert result == {**first["data"], **second["data"]}
 
     def test_expand(self, flake_factory):
@@ -524,13 +488,9 @@ class TestFlakeMerge:
             remove=True,
         )
 
-        assert call_action(
-            "flakes_flake_show", {"user": user["name"]}, id=new["id"]
-        )
+        assert call_action("flakes_flake_show", {"user": user["name"]}, id=new["id"])
         with pytest.raises(tk.ObjectNotFound):
-            call_action(
-                "flakes_flake_show", {"user": user["name"]}, id=flake["id"]
-            )
+            call_action("flakes_flake_show", {"user": user["name"]}, id=flake["id"])
 
 
 @pytest.mark.usefixtures("with_plugins", "clean_db")

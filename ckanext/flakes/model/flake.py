@@ -2,16 +2,10 @@ from __future__ import annotations
 
 from collections import ChainMap
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Iterable, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from flatten_dict import flatten
-from sqlalchemy import (
-    Column,
-    DateTime,
-    ForeignKey,
-    UnicodeText,
-    UniqueConstraint,
-)
+from sqlalchemy import Column, DateTime, ForeignKey, UnicodeText, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship
 from typing_extensions import Self
@@ -32,15 +26,9 @@ class Flake(Base):
     id = Column(UnicodeText, primary_key=True, default=make_uuid)
     name: Optional[str] = Column(UnicodeText, unique=True, nullable=True)
     data: dict[str, Any] = Column(JSONB, nullable=False)
-    modified_at: datetime = Column(
-        DateTime, nullable=False, default=datetime.utcnow
-    )
-    author_id: str = Column(
-        UnicodeText, ForeignKey(model.User.id), nullable=False
-    )
-    parent_id: Optional[str] = Column(
-        UnicodeText, ForeignKey("flakes_flake.id")
-    )
+    modified_at: datetime = Column(DateTime, nullable=False, default=datetime.utcnow)
+    author_id: str = Column(UnicodeText, ForeignKey(model.User.id), nullable=False)
+    parent_id: Optional[str] = Column(UnicodeText, ForeignKey("flakes_flake.id"))
     extras: dict[str, Any] = Column(JSONB, nullable=False, default=dict)
 
     UniqueConstraint(name, author_id)
@@ -51,9 +39,7 @@ class Flake(Base):
     )
     parent = relationship(
         "Flake",
-        backref=backref(
-            "flakes", cascade="all, delete-orphan", single_parent=True
-        ),
+        backref=backref("flakes", cascade="all, delete-orphan", single_parent=True),
         remote_side=[id],
     )
 

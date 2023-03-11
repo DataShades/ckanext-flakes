@@ -34,9 +34,7 @@ def upgrade():
             sa.ForeignKey("user.id"),
             nullable=False,
         ),
-        sa.Column(
-            "parent_id", sa.UnicodeText, sa.ForeignKey("flakes_flake.id")
-        ),
+        sa.Column("parent_id", sa.UnicodeText, sa.ForeignKey("flakes_flake.id")),
         sa.Column("extras", JSONB, nullable=False),
         sa.UniqueConstraint("name", "author_id"),
     )
