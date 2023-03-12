@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/DataShades/ckanext-flakes/compare/v0.2.3...v0.3.0) (2023-03-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* flake_list accepts athor_id
+* flake_create(author_id=None) creates unowned flakes
+
+### Features
+
+* add config declarations ([6ac4bbb](https://github.com/DataShades/ckanext-flakes/commit/6ac4bbb960cc7efbcd21bfb38f967d8507dbb89d))
+* flake_create(author_id=None) creates unowned flakes ([55755ce](https://github.com/DataShades/ckanext-flakes/commit/55755ce1b45f52c9fb3a1ec8713847515bedb478))
+* flake_list accepts athor_id ([a385a61](https://github.com/DataShades/ckanext-flakes/commit/a385a6138c449280c7d7ba79ab4f7a9c25abf572))
+* lookup unowned flakes with author_id=None ([608d0a9](https://github.com/DataShades/ckanext-flakes/commit/608d0a957dff79544fa8638305031378edc957c6))
+
 ### [0.2.3](https://github.com/DataShades/ckanext-flakes/compare/v0.2.2...v0.2.3) (2023-03-02)
 
 
