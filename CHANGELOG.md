@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.3](https://github.com/DataShades/ckanext-flakes/compare/v0.3.2...v0.3.3) (2023-03-12)
+
+
+### Features
+
+* flakes_rating shows rating of multiple items ([0a2390d](https://github.com/DataShades/ckanext-flakes/commit/0a2390d46231e7d4cee460e60057d7c7849044ac))
+
 ### [0.3.2](https://github.com/DataShades/ckanext-flakes/compare/v0.3.1...v0.3.2) (2023-03-12)
 
 
