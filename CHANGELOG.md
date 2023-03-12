@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.4](https://github.com/DataShades/ckanext-flakes/compare/v0.3.3...v0.3.4) (2023-03-12)
+
+
+### Bug Fixes
+
+* search by author ignores name ([85b411c](https://github.com/DataShades/ckanext-flakes/commit/85b411c825bace3c32ddec0a73e226bb5ef0f43d))
+
 ### [0.3.3](https://github.com/DataShades/ckanext-flakes/compare/v0.3.2...v0.3.3) (2023-03-12)
 
 
