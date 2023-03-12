@@ -1,11 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from ckan.logic.schema import validator_args
-
-if TYPE_CHECKING:
-    from ckan.types import Schema, Validator
 
 
 @validator_args
@@ -19,7 +14,7 @@ def flake_create(
     flakes_flake_id_exists,
     ignore_empty,
     empty_if_not_sysadmin,
-) -> Schema:
+):
     return {
         "name": [ignore_empty, unicode_safe],
         "data": [not_missing, convert_to_json_if_string, dict_only],
@@ -39,7 +34,7 @@ def flake_update(
     ignore_missing,
     unicode_safe,
     flakes_flake_id_exists,
-) -> Schema:
+):
     return {
         "id": [not_missing, unicode_safe],
         "data": [not_missing, convert_to_json_if_string, dict_only],
@@ -57,14 +52,14 @@ def flake_override(not_empty, unicode_safe):
 
 
 @validator_args
-def flake_delete(not_missing: Validator, unicode_safe: Validator) -> Schema:
+def flake_delete(not_missing, unicode_safe):
     return {
         "id": [not_missing, unicode_safe],
     }
 
 
 @validator_args
-def flake_show(not_missing, boolean_validator, unicode_safe) -> Schema:
+def flake_show(not_missing, boolean_validator, unicode_safe):
     return {
         "id": [not_missing, unicode_safe],
         "expand": [boolean_validator],
@@ -79,7 +74,7 @@ def flake_list(
     default,
     empty_if_not_sysadmin,
     ignore_missing,
-) -> Schema:
+):
     return {
         "author_id": [empty_if_not_sysadmin],
         "expand": [boolean_validator],
@@ -90,7 +85,7 @@ def flake_list(
 @validator_args
 def flake_lookup(
     boolean_validator, not_empty, unicode_safe, empty_if_not_sysadmin
-) -> Schema:
+):
     return {
         "name": [not_empty, unicode_safe],
         "expand": [boolean_validator],
@@ -99,7 +94,7 @@ def flake_lookup(
 
 
 @validator_args
-def flake_validate(boolean_validator, not_missing, unicode_safe) -> Schema:
+def flake_validate(boolean_validator, not_missing, unicode_safe):
     return {
         "id": [not_missing, unicode_safe],
         "expand": [boolean_validator],
@@ -110,7 +105,7 @@ def flake_validate(boolean_validator, not_missing, unicode_safe) -> Schema:
 @validator_args
 def data_validate(
     convert_to_json_if_string, dict_only, not_missing, unicode_safe
-) -> Schema:
+):
     return {
         "data": [not_missing, convert_to_json_if_string, dict_only],
         "schema": [not_missing, unicode_safe],
@@ -120,7 +115,7 @@ def data_validate(
 @validator_args
 def data_example(
     not_missing, convert_to_json_if_string, dict_only, default, unicode_safe
-) -> Schema:
+):
     return {
         "factory": [not_missing, unicode_safe],
         "data": [default("{}"), convert_to_json_if_string, dict_only],
@@ -130,7 +125,7 @@ def data_example(
 @validator_args
 def flake_materialize(
     boolean_validator, not_missing, flakes_into_api_action, unicode_safe
-) -> Schema:
+):
     return {
         "id": [not_missing, unicode_safe],
         "expand": [boolean_validator],
@@ -146,7 +141,7 @@ def flake_combine(
     json_list_or_string,
     convert_to_json_if_string,
     dict_only,
-) -> Schema:
+):
     return {
         "id": [not_missing, json_list_or_string],
         "expand": [default("{}"), convert_to_json_if_string, dict_only],
@@ -167,7 +162,7 @@ def extras_patch(
     convert_to_json_if_string,
     dict_only,
     unicode_safe,
-) -> Schema:
+):
     return {
         "id": [not_missing, unicode_safe],
         "extras": [not_missing, convert_to_json_if_string, dict_only],
@@ -180,7 +175,7 @@ def data_patch(
     convert_to_json_if_string,
     dict_only,
     unicode_safe,
-) -> Schema:
+):
     return {
         "id": [not_missing, unicode_safe],
         "data": [not_missing, convert_to_json_if_string, dict_only],

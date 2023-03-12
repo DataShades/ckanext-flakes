@@ -93,7 +93,7 @@ flake_list(
 
 Scenario: each user can set a theme of application and this theme will be applied only for the current user
 
-Flake are created for the user from the `context`. Flakes of the user A are
+Flakes are created for the user from the `context`. Flakes of the user A are
 visible only to the user A, flakes of the user B exist in the different
 namespace and are visible only to the user B.
 
@@ -140,7 +140,7 @@ assert mary_theme == "light"
 
 ### Create and obtain global variable
 
-Scenario: application requires global option, that can by changed in runtime
+Scenario: application requires global option, that can be changed in runtime
 
 By default flakes are created in the "namespace" of the current user. Only the
 author can see and modify his own flakes.
