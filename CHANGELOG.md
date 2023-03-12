@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.2](https://github.com/DataShades/ckanext-flakes/compare/v0.3.1...v0.3.2) (2023-03-12)
+
+
+### Bug Fixes
+
+* override works with unowned flakes ([cdae07d](https://github.com/DataShades/ckanext-flakes/commit/cdae07df0330bac6a39613419f69f0f1e4720caf))
+
 ### [0.3.1](https://github.com/DataShades/ckanext-flakes/compare/v0.3.0...v0.3.1) (2023-03-12)
 
 
