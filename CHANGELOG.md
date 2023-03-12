@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.1](https://github.com/DataShades/ckanext-flakes/compare/v0.3.0...v0.3.1) (2023-03-12)
+
+
+### Bug Fixes
+
+* remove type annotations from schemas(v2.9 support) ([a8e309a](https://github.com/DataShades/ckanext-flakes/commit/a8e309a4c097ba6b7c44a7d3766e37e1e0cc64dd))
+
 ## [0.3.0](https://github.com/DataShades/ckanext-flakes/compare/v0.2.3...v0.3.0) (2023-03-12)
 
 
