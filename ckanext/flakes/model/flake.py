@@ -27,7 +27,7 @@ class Flake(Base):
     name: Optional[str] = Column(UnicodeText, unique=True, nullable=True)
     data: dict[str, Any] = Column(JSONB, nullable=False)
     modified_at: datetime = Column(DateTime, nullable=False, default=datetime.utcnow)
-    author_id: str = Column(UnicodeText, ForeignKey(model.User.id), nullable=False)
+    author_id: Optional[str] = Column(UnicodeText, ForeignKey(model.User.id), nullable=False)
     parent_id: Optional[str] = Column(UnicodeText, ForeignKey("flakes_flake.id"))
     extras: dict[str, Any] = Column(JSONB, nullable=False, default=dict)
 
@@ -65,17 +65,14 @@ class Flake(Base):
         return result
 
     @classmethod
-    def by_author(cls, author_id: str) -> "Query[Self]":
+    def by_author(cls, author_id: Optional[str]) -> "Query[Self]":
         """Get user's flakes."""
         return model.Session.query(cls).filter_by(author_id=author_id)
 
     @classmethod
     def by_name(cls, name: str, author_id: Optional[str]) -> "Query[Self]":
         """Get user's flake using unique name of flake."""
-        q = model.Session.query(cls)
-
-        if author_id:
-            q = q.filter_by(name=name, author_id=author_id)
+        q = cls.by_author(author_id).filter_by(name=name)
 
         return q
 
