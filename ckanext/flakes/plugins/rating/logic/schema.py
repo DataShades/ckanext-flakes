@@ -43,6 +43,15 @@ def average(not_missing, unicode_safe):
     }
 
 
+
+@validator_args
+def average_list(not_missing, unicode_safe, list_of_strings):
+    return {
+        "target_ids": [not_missing, list_of_strings],
+        "target_type": [not_missing, unicode_safe],
+    }
+
+
 @validator_args
 def average_package(not_missing, unicode_safe):
     return {

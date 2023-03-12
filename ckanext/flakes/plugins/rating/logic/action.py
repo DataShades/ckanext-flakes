@@ -42,6 +42,40 @@ def average(context, data_dict):
         "own": own_rating,
     }
 
+@action
+@validate(schema.average_list)
+def average_list(context, data_dict):
+    tk.check_access("flakes_rating_average_list", context, data_dict)
+
+    names = {
+        _name(data_dict["target_type"], id_): id_ for id_ in data_dict["target_ids"]
+    }
+
+    q = (
+        context["session"]
+        .query(
+            Flake.name,
+            sa.func.count(Flake.id).label("count"),
+            sa.func.avg(Flake.data["rating"].astext.cast(sa.Float)).label("average"),
+        )
+        .group_by(Flake.name)
+        .filter(Flake.name.in_(names))
+    )
+
+
+    result = {
+        r.name: {
+            "count": r.count,
+            "average": r.average,
+        }
+        for r in q
+    }
+
+    return {
+        id_: result[name] if name in result else {"count": 0, "average": 0}
+        for name, id_ in names.items()
+    }
+
 
 @action
 @validate(schema.average_package)
