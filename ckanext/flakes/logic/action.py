@@ -28,7 +28,6 @@ def flake_create(context, data_dict):
         extras (dict): flake's extra details
 
     """
-
     tk.check_access("flakes_flake_create", context, data_dict)
 
     author_id = data_dict.pop("author_id", tk.missing)
@@ -113,7 +112,7 @@ def flake_list(context, data_dict):
 
     context["expand"] = data_dict["expand"]
 
-    author_id = data_dict.get("author_id")
+    author_id = data_dict.get("author_id", tk.missing)
 
     if author_id is not None:
         if author_id is tk.missing:
@@ -172,7 +171,6 @@ def flake_override(context, data_dict):
         author_id (str, optional): author ID(can be set only by sysadmin if flake does not exist)
         extras (dict): flake's extra details
     """
-
     tk.check_access("flakes_flake_override", context, data_dict)
     try:
         flake = tk.get_action("flakes_flake_lookup")(
@@ -222,10 +220,9 @@ def flake_lookup(context, data_dict):
         author_id (str, optional): author ID(can be set only by sysadmin)
 
     """
-
     tk.check_access("flakes_flake_lookup", context, data_dict)
 
-    author_id = data_dict.get("author_id")
+    author_id = data_dict.get("author_id", tk.missing)
 
     if author_id is not None:
         if author_id is tk.missing:
