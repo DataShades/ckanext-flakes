@@ -15,3 +15,10 @@ groups:
         example: 0
         description: |
           Lower bound for the rating
+
+      - key: ckanext.flakes_rating.show_package_widget
+        type: bool
+        default: false
+        example: true
+        description: |
+          Show rating widget on the package page
