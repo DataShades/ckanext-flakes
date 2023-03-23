@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.7](https://github.com/DataShades/ckanext-flakes/compare/v0.3.6...v0.3.7) (2023-03-23)
+
+
+### Bug Fixes
+
+* flakes_feedback ignores delete permissions ([11de936](https://github.com/DataShades/ckanext-flakes/commit/11de9363aa307e56c7d8cbfbec7f43126739bbf0))
+
 ### [0.3.6](https://github.com/DataShades/ckanext-flakes/compare/v0.3.5...v0.3.6) (2023-03-23)
 
 
