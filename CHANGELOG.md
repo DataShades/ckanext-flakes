@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.6](https://github.com/DataShades/ckanext-flakes/compare/v0.3.5...v0.3.6) (2023-03-23)
+
+
+### Features
+
+* add "delete" button to feedbacks list ([192709d](https://github.com/DataShades/ckanext-flakes/commit/192709d407863c39f253aac0530765604d2d0a55))
+* add blocks to feedbacks listing ([376bb65](https://github.com/DataShades/ckanext-flakes/commit/376bb65f6b7e90d73864db89c8436f4694cc69e9))
+
 ### [0.3.5](https://github.com/DataShades/ckanext-flakes/compare/v0.3.4...v0.3.5) (2023-03-23)
 
 
