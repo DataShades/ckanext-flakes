@@ -16,7 +16,13 @@
             <li>
                 {% block feedback scoped %}
                     {{ h.time_ago_from_timestamp(feedback.modified_at) }} by {{ h.linked_user(feedback.author_id) }}
+
+                    {% if h.check_access("flakes_feedback_feedback_delete", {id: feedback.id}) %}
+                        {% link_for _('Delete'), named_route="flakes_feedback.delete", id=pkg.name, package_type=pkg_dict.type, feedback_id=feedback.id, class_='btn btn-xs btn-link', icon='comment-slash' %}
+                    {% endif %}
+
                     <br/>
+
                     <blockquote>
                         {{ h.render_markdown(feedback.data.feedback) }}
                     </blockquote>
