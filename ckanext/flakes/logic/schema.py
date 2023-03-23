@@ -83,9 +83,7 @@ def flake_list(
 
 
 @validator_args
-def flake_lookup(
-    boolean_validator, not_empty, unicode_safe, empty_if_not_sysadmin
-):
+def flake_lookup(boolean_validator, not_empty, unicode_safe, empty_if_not_sysadmin):
     return {
         "name": [not_empty, unicode_safe],
         "expand": [boolean_validator],
@@ -103,9 +101,7 @@ def flake_validate(boolean_validator, not_missing, unicode_safe):
 
 
 @validator_args
-def data_validate(
-    convert_to_json_if_string, dict_only, not_missing, unicode_safe
-):
+def data_validate(convert_to_json_if_string, dict_only, not_missing, unicode_safe):
     return {
         "data": [not_missing, convert_to_json_if_string, dict_only],
         "schema": [not_missing, unicode_safe],

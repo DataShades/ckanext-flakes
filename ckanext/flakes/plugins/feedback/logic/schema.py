@@ -8,12 +8,14 @@ def feedback_create(not_missing, unicode_safe):
         "data": [not_missing],
     }
 
+
 @validator_args
 def feedback_update(not_missing, unicode_safe):
     return {
         "id": [not_missing, unicode_safe],
         "data": [not_missing],
     }
+
 
 @validator_args
 def feedback_delete(not_missing, unicode_safe):
@@ -34,6 +36,7 @@ def feedback_show(not_missing, unicode_safe):
     return {
         "id": [not_missing, unicode_safe],
     }
+
 
 @validator_args
 def feedback_lookup(not_missing, unicode_safe):

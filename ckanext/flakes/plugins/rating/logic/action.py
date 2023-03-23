@@ -42,6 +42,7 @@ def average(context, data_dict):
         "own": own_rating,
     }
 
+
 @action
 @validate(schema.average_list)
 def average_list(context, data_dict):
@@ -61,7 +62,6 @@ def average_list(context, data_dict):
         .group_by(Flake.name)
         .filter(Flake.name.in_(names))
     )
-
 
     result = {
         r.name: {

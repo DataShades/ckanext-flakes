@@ -27,7 +27,9 @@ class Flake(Base):
     name: Optional[str] = Column(UnicodeText, unique=True, nullable=True)
     data: dict[str, Any] = Column(JSONB, nullable=False)
     modified_at: datetime = Column(DateTime, nullable=False, default=datetime.utcnow)
-    author_id: Optional[str] = Column(UnicodeText, ForeignKey(model.User.id), nullable=False)
+    author_id: Optional[str] = Column(
+        UnicodeText, ForeignKey(model.User.id), nullable=False
+    )
     parent_id: Optional[str] = Column(UnicodeText, ForeignKey("flakes_flake.id"))
     extras: dict[str, Any] = Column(JSONB, nullable=False, default=dict)
 

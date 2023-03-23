@@ -15,6 +15,7 @@ def get_rating(type_: str, id_: str) -> dict[str, int]:
         {}, {"target_id": id_, "target_type": type_}
     )
 
+
 @helper
 def get_rating_list(type_: str, ids: list[str]) -> dict[str, int]:
     return tk.get_action("flakes_rating_average_list")(

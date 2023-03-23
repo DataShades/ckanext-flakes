@@ -11,6 +11,7 @@ from .logic import action, auth, validators
 try:
     config_declarations = tk.blanket.config_declarations
 except AttributeError:
+
     def config_declarations(cls):
         return cls
 

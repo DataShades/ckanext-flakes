@@ -3,13 +3,13 @@ from __future__ import annotations
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 
-
 from . import views
-from .logic import auth, action
+from .logic import action, auth
 
 try:
     config_declarations = tk.blanket.config_declarations
 except AttributeError:
+
     def config_declarations(cls):
         return cls
 

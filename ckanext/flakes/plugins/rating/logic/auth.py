@@ -13,6 +13,7 @@ auth, get_auth_functions = Collector("flakes_rating").split()
 def average_list(context, data_dict):
     return {"success": True}
 
+
 @auth
 @tk.auth_allow_anonymous_access
 def average(context, data_dict):

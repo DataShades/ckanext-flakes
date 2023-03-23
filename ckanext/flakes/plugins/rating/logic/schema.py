@@ -43,7 +43,6 @@ def average(not_missing, unicode_safe):
     }
 
 
-
 @validator_args
 def average_list(not_missing, unicode_safe, list_of_strings):
     return {

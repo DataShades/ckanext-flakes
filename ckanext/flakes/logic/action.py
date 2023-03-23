@@ -173,9 +173,7 @@ def flake_override(context, data_dict):
     """
     tk.check_access("flakes_flake_override", context, data_dict)
     try:
-        flake = tk.get_action("flakes_flake_lookup")(
-            context.copy(), data_dict
-        )
+        flake = tk.get_action("flakes_flake_lookup")(context.copy(), data_dict)
     except tk.ObjectNotFound:
         action = tk.get_action("flakes_flake_create")
     else:
