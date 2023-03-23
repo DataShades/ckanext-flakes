@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.5](https://github.com/DataShades/ckanext-flakes/compare/v0.3.4...v0.3.5) (2023-03-23)
+
+
+### Features
+
+* default rating widget for flakes_rating ([6db114a](https://github.com/DataShades/ckanext-flakes/commit/6db114a668d6419dfa8084b321fe5b107678d8e7))
+* flakes_feedback plugin ([5c98b4e](https://github.com/DataShades/ckanext-flakes/commit/5c98b4e10853edae05bf16f68a812b327ee2ae29))
+
+
+### Bug Fixes
+
+* lookup and list do not show owned flakes ([9b3d4a8](https://github.com/DataShades/ckanext-flakes/commit/9b3d4a87736efdcb8b5e2089e3a7d3fd4e42ff7e))
+
 ### [0.3.4](https://github.com/DataShades/ckanext-flakes/compare/v0.3.3...v0.3.4) (2023-03-12)
 
 
