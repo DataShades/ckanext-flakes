@@ -16,6 +16,7 @@ with your suggestion.
 ## Structure
 
 * [Examples](#examples)
+* [Example plugins](#example-plugins)
 * [Requirements](#definition)
 * [Installation](#installation)
 * [Configuration](#configuration)
@@ -169,6 +170,23 @@ value = tk.get_action("flakes_flake_lookup")(
 )["data"]["value"]
 ```
 
+
+## Example plugins
+
+These plugins implement basic features that can be used as a real-life example
+of `ckanext-flakes` usage.
+
+### `flakes_rating`
+
+User can rate a package via API action. Add
+`ckanext.flakes_rating.show_package_widget = true` to the config and default
+widget will be added to the sidebar on `dataset.read` page.
+
+### `flakes_feedback`
+
+User can leave a feedback for package via API action. Add
+`ckanext.flakes_feedback.enable_views = true` to the config and default page
+will be added to navigation tabs on `dataset.read` page.
 
 ## Requirements
 
