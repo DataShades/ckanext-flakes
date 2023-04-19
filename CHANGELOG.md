@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.9](https://github.com/DataShades/ckanext-flakes/compare/v0.3.8...v0.3.9) (2023-04-19)
+
+
+### Bug Fixes
+
+* allow double-classes on rate widget ([8b75acb](https://github.com/DataShades/ckanext-flakes/commit/8b75acb353f9695cf6f334c02d60f5a4b3d7d184))
+
 ### [0.3.8](https://github.com/DataShades/ckanext-flakes/compare/v0.3.7...v0.3.8) (2023-04-19)
 
 
