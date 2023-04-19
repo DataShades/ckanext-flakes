@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.8](https://github.com/DataShades/ckanext-flakes/compare/v0.3.7...v0.3.8) (2023-04-19)
+
+
+### Features
+
+* flakes_rating allows configuring both star states ([c143d21](https://github.com/DataShades/ckanext-flakes/commit/c143d21d1f769feccb302834ab7cc86552a08e1b))
+
+
+### Bug Fixes
+
+* flakes_feedback cannot be hidden from UI ([b63b704](https://github.com/DataShades/ckanext-flakes/commit/b63b704bc6ebfbb013a55bd97379924d50ae2517))
+
 ### [0.3.7](https://github.com/DataShades/ckanext-flakes/compare/v0.3.6...v0.3.7) (2023-03-23)
 
 
