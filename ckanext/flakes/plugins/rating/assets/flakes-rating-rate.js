@@ -5,9 +5,9 @@ ckan.module("flakes-rating-rate", function ($) {
     options: {
       type: null,
       id: null,
-        current: 0,
-        starClass: "fa-star-o",
-        starFilledClass: "fa-star",
+      current: 0,
+      starClass: "fa-star-o",
+      starFilledClass: "fa-star",
     },
     initialize: function () {
       $.proxyAll(this, /_on/);
@@ -27,7 +27,10 @@ ckan.module("flakes-rating-rate", function ($) {
         .removeClass("star-empty")
         .removeClass(this.options.starClass)
         .addClass(this.options.starFilledClass);
-        el.nextAll().addClass("star-empty").addClass(this.options.starClass).removeClass(this.options.starFilledClass);
+      el.nextAll()
+        .addClass("star-empty")
+        .removeClass(this.options.starFilledClass)
+        .addClass(this.options.starClass);
     },
 
     _onClick: function (e) {
