@@ -7,6 +7,7 @@ fa_star - FontAwesome class of the star icon
 
 {% set rating = h.flakes_rating_get_rating(type, id) %}
 {% set fa_star = fa_star|default("fa-star-o") %}
+{% set fa_filled_star = fa_filled_star|default("fa-star") %}
 
 
 <style>
@@ -40,6 +41,8 @@ fa_star - FontAwesome class of the star icon
      data-module-type="{{ type }}"
      data-module-id="{{ id }}"
      data-module-current="{{ rating.own }}"
+     data-module-star-class="{{ fa_star }}"
+     data-module-star-filled-class="{{ fa_filled_star }}"
 >
     <div class="star-holder">
         {% for i in range(5) %}
