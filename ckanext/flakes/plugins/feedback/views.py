@@ -22,12 +22,13 @@ def _pkg(id_: str):
         return tk.abort(404)
 
 
-def _existing(id_: str):
+def _existing(id_: str, secondary_key: str | None):
     try:
         return tk.get_action("flakes_feedback_feedback_lookup")(
             {},
             {
                 "package_id": id_,
+                "secondary_key": secondary_key,
             },
         )
     except (tk.NotAuthorized, tk.ObjectNotFound):
@@ -46,12 +47,9 @@ def index(package_type: str, id: str) -> str:
     except (tk.ObjectNotFound, tk.NotAuthorized):
         return tk.abort(404)
 
-    existing = _existing(id)
-
     data = {
         "pkg_dict": pkg_dict,
         "feedbacks": feedbacks,
-        "existing": existing,
     }
 
     return tk.render("flakes_feedback/index.html", data)
@@ -64,15 +62,20 @@ class PostView(MethodView):
     def post(self, package_type: str, id: str):
         pkg_dict = _pkg(id)
         data = parse_params(tk.request.form)
-        feedback = _existing(id)
+        secondary_key = tk.request.args.get("secondary_key")
+        feedback = _existing(id, secondary_key)
+
+        if feedback:
+            action = "flakes_feedback_feedback_update"
+            pk = {"id": feedback["id"]}
+        else:
+            action = "flakes_feedback_feedback_create"
+            pk = {"package_id": id}
 
         try:
-            feedback = tk.get_action("flakes_feedback_feedback_create")(
+            feedback = tk.get_action(action)(
                 {},
-                {
-                    "package_id": id,
-                    "data": data,
-                },
+                dict(pk, data=data, secondary_key=secondary_key),
             )
         except tk.NotAuthorized:
             return tk.abort(403)
@@ -91,7 +94,8 @@ class PostView(MethodView):
 
     def get(self, package_type: str, id: str):
         pkg_dict = _pkg(id)
-        feedback = _existing(id)
+        secondary_key = tk.request.args.get("secondary_key")
+        feedback = _existing(id, secondary_key)
 
         data = {
             "pkg_dict": pkg_dict,

@@ -20,12 +20,20 @@ def feedback_create(context, data_dict):
     if not pkg:
         raise tk.ObjectNotFound("Package not found")
 
-    flake = tk.get_action("flakes_flake_override")(
+    secondary_key: str | None = data_dict["secondary_key"]
+
+    flake = tk.get_action("flakes_flake_create")(
         context,
         {
-            "name": _name(pkg.id),
+            "name": _name(pkg.id, secondary_key),
             "data": data_dict["data"],
-            "extras": {"flakes_feedback": {"type": "package", "id": pkg.id}},
+            "extras": {
+                "flakes_feedback": {
+                    "type": "package",
+                    "id": pkg.id,
+                    "secondary_key": secondary_key,
+                }
+            },
         },
     )
 
@@ -36,11 +44,28 @@ def feedback_create(context, data_dict):
 @validate(schema.feedback_update)
 def feedback_update(context, data_dict):
     tk.check_access("flakes_feedback_feedback_update", context, data_dict)
+    secondary_key: str | None = data_dict["secondary_key"]
 
     try:
         flake = tk.get_action("flakes_flake_update")(context, data_dict)
     except tk.ObjectNotFound as e:
         raise tk.ObjectNotFound("Feedback not found") from e
+
+    extras = flake["extras"]["flakes_feedback"]
+    if extras.get("secondary_key") != secondary_key:
+        old_id = flake["id"]
+        flake = tk.get_action("flakes_flake_override")(
+            context,
+            {
+                "name": _name(extras["id"], secondary_key),
+                "data": flake["data"],
+                "extras": {
+                    "flakes_feedback": dict(extras, secondary_key=secondary_key)
+                },
+            },
+        )
+
+        tk.get_action("flakes_feedback_feedback_delete")(context, {"id": old_id})
 
     return flake
 
@@ -98,18 +123,23 @@ def feedback_show(context, data_dict):
 @validate(schema.feedback_lookup)
 def feedback_lookup(context, data_dict):
     tk.check_access("flakes_feedback_feedback_list", context, data_dict)
+    secondary_key: str | None = data_dict["secondary_key"]
 
     pkg = model.Package.get(data_dict["package_id"])
     if not pkg:
         raise tk.ObjectNotFound("Package not found")
 
     try:
-        flake = tk.get_action("flakes_flake_lookup")(context, {"name": _name(pkg.id)})
+        flake = tk.get_action("flakes_flake_lookup")(context, {"name": _name(pkg.id, secondary_key)})
     except tk.ObjectNotFound as e:
         raise tk.ObjectNotFound("Feedback not found") from e
 
     return flake
 
 
-def _name(id_: str):
-    return f"ckanext:flakes_feedback:feedback:package:{id_}"
+def _name(id_: str, secondary_key: str | None) -> str:
+    name = f"ckanext:flakes_feedback:feedback:package:{id_}"
+    if secondary_key:
+        name = f"{name}:{secondary_key}"
+
+    return name
