@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/DataShades/ckanext-flakes/compare/v0.3.9...v0.4.0) (2023-06-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* flakes_feedback use secondary_key for multiple feedbacks per package
+
+### Features
+
+* flakes_feedback use secondary_key for multiple feedbacks per package ([5b3594f](https://github.com/DataShades/ckanext-flakes/commit/5b3594f6f6fd67a0827703fdd525d245c2d13561))
+
 ### [0.3.9](https://github.com/DataShades/ckanext-flakes/compare/v0.3.8...v0.3.9) (2023-04-19)
 
 
