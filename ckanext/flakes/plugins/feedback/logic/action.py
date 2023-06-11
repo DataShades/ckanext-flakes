@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any
 
 import ckan.plugins.toolkit as tk
 from ckan import model
@@ -22,20 +23,36 @@ def feedback_create(context, data_dict):
 
     secondary_key: str | None = data_dict["secondary_key"]
 
-    flake = tk.get_action("flakes_flake_create")(
-        context,
-        {
-            "name": _name(pkg.id, secondary_key),
-            "data": data_dict["data"],
-            "extras": {
-                "flakes_feedback": {
-                    "type": "package",
-                    "id": pkg.id,
-                    "secondary_key": secondary_key,
-                }
-            },
+    payload: dict[str, Any] = {
+        "data": data_dict["data"],
+        "extras": {
+            "flakes_feedback": {
+                "type": "package",
+                "id": pkg.id,
+                "secondary_key": secondary_key,
+            }
         },
-    )
+    }
+
+    try:
+        existing = tk.get_action("flakes_feedback_feedback_lookup")(
+            {},
+            {
+                "package_id": pkg.id,
+                "secondary_key": secondary_key,
+            },
+        )
+    except tk.ObjectNotFound:
+        payload["name"] = _name(pkg.id, secondary_key)
+        action = "flakes_flake_create"
+    else:
+        if tk.asbool(tk.config.get("ckanext.flakes_feedback.allow_overrides")):
+            payload["id"] = existing["id"]
+            action = "flakes_flake_update"
+        else:
+            raise tk.ValidationError({"name": ["Already exists"]})
+
+    flake = tk.get_action(action)(context, payload,)
 
     return flake
 
