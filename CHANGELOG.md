@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.1](https://github.com/DataShades/ckanext-flakes/compare/v0.4.0...v0.4.1) (2023-06-11)
+
+
+### Features
+
+* override existing feedbacks via feedback_create ([f34c9c6](https://github.com/DataShades/ckanext-flakes/commit/f34c9c634e9dcd704eddc055015a8ba72b8df776))
+
 ## [0.4.0](https://github.com/DataShades/ckanext-flakes/compare/v0.3.9...v0.4.0) (2023-06-07)
 
 
