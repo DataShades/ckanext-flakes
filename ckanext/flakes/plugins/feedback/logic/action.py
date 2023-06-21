@@ -36,7 +36,7 @@ def feedback_create(context, data_dict):
 
     try:
         existing = tk.get_action("flakes_feedback_feedback_lookup")(
-            {},
+            dict(context),
             {
                 "package_id": pkg.id,
                 "secondary_key": secondary_key,
