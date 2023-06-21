@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.2](https://github.com/DataShades/ckanext-flakes/compare/v0.4.1...v0.4.2) (2023-06-21)
+
+
+### Bug Fixes
+
+* custom context is ignored during feedback creation ([77df6cf](https://github.com/DataShades/ckanext-flakes/commit/77df6cfa43d2c967976bb131bb3726cb5513c42e))
+
 ### [0.4.1](https://github.com/DataShades/ckanext-flakes/compare/v0.4.0...v0.4.1) (2023-06-11)
 
 
