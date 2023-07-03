@@ -6,8 +6,8 @@ from typing import Any, Generic, Optional, TypeVar
 
 from typing_extensions import NotRequired, TypedDict
 
-D = TypeVar("D", bound=Mapping[str, Any])
-E = TypeVar("E", bound=Mapping[str, Any])
+D = TypeVar("D", bound="Mapping[str, Any]")
+E = TypeVar("E", bound="Mapping[str, Any]")
 
 
 class Flake:
