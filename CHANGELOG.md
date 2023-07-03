@@ -16,6 +16,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 * typing does not work in v3.8 ([cea759c](https://github.com/DataShades/ckanext-flakes/commit/cea759cefd6b24830bc2945d8daa4ca3c8887324))
 
+### [0.4.5](https://github.com/DataShades/ckanext-flakes/compare/v0.4.4...v0.4.5) (2023-07-03)
+
+
+### Bug Fixes
+
+* typing does not work in v3.8 ([cea759c](https://github.com/DataShades/ckanext-flakes/commit/cea759cefd6b24830bc2945d8daa4ca3c8887324))
+
 ### [0.4.4](https://github.com/DataShades/ckanext-flakes/compare/v0.4.3...v0.4.4) (2023-07-03)
 
 ### [0.4.3](https://github.com/DataShades/ckanext-flakes/compare/v0.4.2...v0.4.3) (2023-06-21)
