@@ -4,7 +4,6 @@ from collections import ChainMap
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Optional
 
-from flatten_dict import flatten
 from sqlalchemy import Column, DateTime, ForeignKey, UnicodeText, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, relationship
@@ -83,7 +82,8 @@ class Flake(Base):
         cls, extras: dict[str, Any], author_id: Optional[str]
     ) -> "Query[Self]":
         """Get user's flakes using extra attribute."""
-        flattened = flatten(extras)
+
+        flattened = _flat_mask(extras)
 
         q = model.Session.query(cls)
 
@@ -97,3 +97,15 @@ class Flake(Base):
             q = q.filter(cls.author_id == author_id)
 
         return q
+
+
+def _flat_mask(data: dict[str, Any]) -> dict[tuple[Any, ...], Any]:
+    result: dict[tuple[Any, ...], Any] = {}
+
+    for k, v in data.items():
+        if isinstance(v, dict):
+            result.update({(k,) + sk: sv for sk, sv in _flat_mask(v).items()})
+        else:
+            result[(k,)] = v
+
+    return result

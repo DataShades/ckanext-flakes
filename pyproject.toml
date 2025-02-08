@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ckanext-flakes"
-version = "0.4.5.post1"
+version = "0.4.6"
 description = ""
 classifiers = [ "Development Status :: 4 - Beta", "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)", "Programming Language :: Python :: 3.7", "Programming Language :: Python :: 3.8", "Programming Language :: Python :: 3.9", "Programming Language :: Python :: 3.10",]
 keywords = [ "CKAN",]
-dependencies = [ "typing-extensions>=4.0.0", "ckanext-toolbelt", "flatten-dict",]
+dependencies = [ "typing-extensions>=4.0.0", "ckanext-toolbelt",]
 authors = [
     {name = "DataShades", email = "datashades@linkdigital.com.au"},
     {name = "Sergey Motornyuk", email = "sergey.motornyuk@linkdigital.com.au"},
