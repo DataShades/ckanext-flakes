@@ -4,17 +4,13 @@ from typing import Any
 import ckan.plugins.toolkit as tk
 from ckan import model
 from ckan.logic import validate
-
-from ckanext.toolbelt.decorators import Collector
+from ckan import types
 
 from . import schema
 
-action, get_actions = Collector("flakes_feedback").split()
 
-
-@action
 @validate(schema.feedback_create)
-def feedback_create(context, data_dict):
+def flakes_feedback_feedback_create(context: types.Context, data_dict: dict[str, Any]):
     tk.check_access("flakes_feedback_feedback_create", context, data_dict)
 
     pkg = model.Package.get(data_dict["package_id"])
@@ -36,7 +32,7 @@ def feedback_create(context, data_dict):
 
     try:
         existing = tk.get_action("flakes_feedback_feedback_lookup")(
-            dict(context),
+            tk.fresh_context(context),
             {
                 "package_id": pkg.id,
                 "secondary_key": secondary_key,
@@ -52,14 +48,16 @@ def feedback_create(context, data_dict):
         else:
             raise tk.ValidationError({"name": ["Already exists"]})
 
-    flake = tk.get_action(action)(context, payload,)
+    flake = tk.get_action(action)(
+        context,
+        payload,
+    )
 
     return flake
 
 
-@action
 @validate(schema.feedback_update)
-def feedback_update(context, data_dict):
+def flakes_feedback_feedback_update(context: types.Context, data_dict: dict[str, Any]):
     tk.check_access("flakes_feedback_feedback_update", context, data_dict)
     secondary_key: str | None = data_dict["secondary_key"]
 
@@ -87,9 +85,8 @@ def feedback_update(context, data_dict):
     return flake
 
 
-@action
 @validate(schema.feedback_delete)
-def feedback_delete(context, data_dict):
+def flakes_feedback_feedback_delete(context: types.Context, data_dict: dict[str, Any]):
     tk.check_access("flakes_feedback_feedback_delete", context, data_dict)
 
     try:
@@ -100,16 +97,15 @@ def feedback_delete(context, data_dict):
     return flake
 
 
-@action
 @tk.side_effect_free
 @validate(schema.feedback_list)
-def feedback_list(context, data_dict):
+def flakes_feedback_feedback_list(context: types.Context, data_dict: dict[str, Any]):
     tk.check_access("flakes_feedback_feedback_list", context, data_dict)
 
     pkg = model.Package.get(data_dict["package_id"])
 
     flakes = tk.get_action("flakes_flake_list")(
-        dict(context, ignore_auth=True),
+        types.Context(context, ignore_auth=True),
         {
             "author_id": None,
             "extras": {"flakes_feedback": {"type": "package", "id": pkg.id}},
@@ -119,15 +115,14 @@ def feedback_list(context, data_dict):
     return flakes
 
 
-@action
 @tk.side_effect_free
 @validate(schema.feedback_show)
-def feedback_show(context, data_dict):
+def flakes_feedback_feedback_show(context: types.Context, data_dict: dict[str, Any]):
     tk.check_access("flakes_feedback_feedback_show", context, data_dict)
 
     try:
         flake = tk.get_action("flakes_flake_show")(
-            dict(context, ignore_auth=True), {"id": data_dict["id"]}
+            types.Context(context, ignore_auth=True), {"id": data_dict["id"]}
         )
     except tk.ObjectNotFound as e:
         raise tk.ObjectNotFound("Feedback not found") from e
@@ -135,10 +130,9 @@ def feedback_show(context, data_dict):
     return flake
 
 
-@action
 @tk.side_effect_free
 @validate(schema.feedback_lookup)
-def feedback_lookup(context, data_dict):
+def flakes_feedback_feedback_lookup(context: types.Context, data_dict: dict[str, Any]):
     tk.check_access("flakes_feedback_feedback_list", context, data_dict)
     secondary_key: str | None = data_dict["secondary_key"]
 
@@ -147,7 +141,9 @@ def feedback_lookup(context, data_dict):
         raise tk.ObjectNotFound("Package not found")
 
     try:
-        flake = tk.get_action("flakes_flake_lookup")(context, {"name": _name(pkg.id, secondary_key)})
+        flake = tk.get_action("flakes_flake_lookup")(
+            context, {"name": _name(pkg.id, secondary_key)}
+        )
     except tk.ObjectNotFound as e:
         raise tk.ObjectNotFound("Feedback not found") from e
 

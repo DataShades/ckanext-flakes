@@ -11,8 +11,7 @@ from ckan.logic import parse_params
 bp = Blueprint("flakes_feedback", __name__)
 
 
-def get_blueprints():
-    return [bp]
+__all__ = ["bp"]
 
 
 def _pkg(id_: str):

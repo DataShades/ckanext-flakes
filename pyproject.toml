@@ -66,6 +66,9 @@ filterwarnings = [
 [tool.pyright]
 pythonVersion = "3.7"
 include = ["ckanext"]
+extraPaths = [
+           "../ckan",
+]
 exclude = [
     "**/test*",
     "**/migration",
